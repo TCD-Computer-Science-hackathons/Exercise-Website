@@ -72,6 +72,7 @@ public class LoginPage extends VerticalLayout {
             if(registerPasswordField.getValue() != null) {
                 database.insertUser(registerEmailField.getValue(), registerPasswordField.getValue());
                 registerForm.close();
+                VL.add(new Label("User registered successfully!"));
             }
         });
 
@@ -79,9 +80,13 @@ public class LoginPage extends VerticalLayout {
         Button loginButton = new Button("Login");
         Button registerButton = new Button("Register");
         loginButton.addClickListener(var -> {
-            loginButton.getUI().ifPresent(ui ->
-                    ui.navigate("group"));
-
+            if(database.userExists(loginEmailField.getValue(), loginPasswordField.getValue())) {
+                loginButton.getUI().ifPresent(ui ->
+                        ui.navigate("group"));
+            }
+            else {
+                VL.add(new Label("Error: USER NOT FOUND"));
+            }
         });
         registerButton.addClickListener(var -> {
             registerForm.open();

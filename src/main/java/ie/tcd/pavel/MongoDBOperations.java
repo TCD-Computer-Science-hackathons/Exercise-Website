@@ -32,6 +32,13 @@ public class MongoDBOperations {
 
     }
 
+    public boolean userExists(String login, String password)
+    {
+        Query searchUser = new Query(Criteria.where("login").is(login).and("password").is(password));
+        List<User> resultUsers = mongoTemplate.query(User.class).matching(searchUser).all();
+        return resultUsers.size() > 0;
+    }
+
     public List<User> searchUserByName(String forename, String surname) {
 
         Query searchUser = new Query(Criteria.where("forename").is(forename).and("surname").is(surname));
