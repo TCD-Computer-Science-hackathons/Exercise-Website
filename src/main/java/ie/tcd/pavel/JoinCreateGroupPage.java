@@ -28,14 +28,12 @@ public class JoinCreateGroupPage extends VerticalLayout {
 		add(horLay);
 		
 		Dialog dialog = new Dialog();
-		Input groupNameIn = new Input();
-		Input groupPassIn = new Input();
-		Input newGroupNameIn = new Input();
-		Input newGroupPassIn = new Input();
+		TextField groupNameIn = new TextField();
+		TextField groupPassIn = new TextField();
+		TextField newGroupNameIn = new TextField();
+		TextField newGroupPassIn = new TextField();
 		Div head1 = new Div();
 		Div head2 = new Div();
-		head1.addClassName("my-style");
-		head2.addClassName("my-style");
 		
 		VerticalLayout verLay = new VerticalLayout (head1,groupNameIn,head2,groupPassIn,confirm);
 		dialog.add(verLay);
