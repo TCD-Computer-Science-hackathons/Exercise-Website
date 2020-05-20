@@ -2,7 +2,7 @@ package ie.tcd.pavel.utility;
 
 import java.util.Date;
 
-public class ChallengeAdaptor {
+public class ExerciseAdaptor {
 
     public static String getDistanceFieldInfo(String value, String unit)
     {

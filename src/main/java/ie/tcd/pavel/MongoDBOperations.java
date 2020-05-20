@@ -1,6 +1,6 @@
 package ie.tcd.pavel;
 
-import ie.tcd.pavel.documents.Challenge;
+import ie.tcd.pavel.documents.Exercise;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -51,112 +51,112 @@ public class MongoDBOperations {
         mongoTemplate.remove(user);
     }
 
-    public void insertChallenge(String owner, String type, String information, long date) {
-        mongoTemplate.insert(new Challenge(owner, type, information, date));
+    public void insertExercise(String owner, String type, String information, long date) {
+        mongoTemplate.insert(new Exercise(owner, type, information, date));
     }
 
-    public List<Challenge> getChallengesByOwner(String owner)
+    public List<Exercise> getExercisesByOwner(String owner)
     {
-        Query searchChallenge = new Query(Criteria.where("owner").is(owner));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        Query searchExercise = new Query(Criteria.where("owner").is(owner));
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public List<Challenge> getChallengesByType(String type)
+    public List<Exercise> getExercisesByType(String type)
     {
-        Query searchChallenge = new Query(Criteria.where("type").is(type));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        Query searchExercise = new Query(Criteria.where("type").is(type));
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public List<Challenge> getChallengesByTypeAndOwner(String owner,String type)
+    public List<Exercise> getExercisesByTypeAndOwner(String owner,String type)
     {
-        Query searchChallenge = new Query(Criteria.where("type").is(type).and("owner").is(owner));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        Query searchExercise = new Query(Criteria.where("type").is(type).and("owner").is(owner));
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public Challenge getChallengeByOwnerAndTypeAndDate(String owner, String type, Date date)
+    public Exercise getExerciseByOwnerAndTypeAndDate(String owner, String type, Date date)
     {
-        Query searchChallenge = new Query(Criteria.where("type").is(type).and("owner").is(owner).and("date").
+        Query searchExercise = new Query(Criteria.where("type").is(type).and("owner").is(owner).and("date").
                 is(date.getTime()));
-        Challenge challenge = mongoTemplate.findOne(searchChallenge, Challenge.class);
+        Exercise Exercise = mongoTemplate.findOne(searchExercise, Exercise.class);
 
-        return  challenge;
+        return  Exercise;
     }
 
-    public List<Challenge> getChallengesByOwnerAndDateGt(String owner, Date date)
+    public List<Exercise> getExercisesByOwnerAndDateGt(String owner, Date date)
     {
-        Query searchChallenge = new Query(Criteria.where("owner").is(owner).and("date").gt(date.getTime()));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        Query searchExercise = new Query(Criteria.where("owner").is(owner).and("date").gt(date.getTime()));
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public List<Challenge> getChallengesByOwnerAndDateLt(String owner, Date date)
+    public List<Exercise> getExercisesByOwnerAndDateLt(String owner, Date date)
     {
-        Query searchChallenge = new Query(Criteria.where("owner").is(owner).and("date").lt(date.getTime()));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        Query searchExercise = new Query(Criteria.where("owner").is(owner).and("date").lt(date.getTime()));
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public List<Challenge> getChallengesByOwnerAndDateInterval(String owner, Date date1, Date date2)
+    public List<Exercise> getExercisesByOwnerAndDateInterval(String owner, Date date1, Date date2)
     {
-        Query searchChallenge = new Query(Criteria.where("owner").is(owner).and("date").gt(date1.getTime()).
+        Query searchExercise = new Query(Criteria.where("owner").is(owner).and("date").gt(date1.getTime()).
                 and("date").lt(date2.getTime()));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public List<Challenge> getChallengesByTypeAndDateGt(String type, Date date)
+    public List<Exercise> getExercisesByTypeAndDateGt(String type, Date date)
     {
-        Query searchChallenge = new Query(Criteria.where("type").is(type).and("date").gt(date.getTime()));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        Query searchExercise = new Query(Criteria.where("type").is(type).and("date").gt(date.getTime()));
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public List<Challenge> getChallengesByTypeAndDateLt(String type, Date date)
+    public List<Exercise> getExercisesByTypeAndDateLt(String type, Date date)
     {
-        Query searchChallenge = new Query(Criteria.where("type").is(type).and("date").lt(date.getTime()));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        Query searchExercise = new Query(Criteria.where("type").is(type).and("date").lt(date.getTime()));
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public List<Challenge> getChallengesByTypeAndDateInterval(String type, Date date1, Date date2)
+    public List<Exercise> getExercisesByTypeAndDateInterval(String type, Date date1, Date date2)
     {
-        Query searchChallenge = new Query(Criteria.where("type").is(type).and("date").gt(date1.getTime()).
+        Query searchExercise = new Query(Criteria.where("type").is(type).and("date").gt(date1.getTime()).
                 and("date").lt(date2.getTime()));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public List<Challenge> getChallengesByOwnerAndTypeAndDateGt(String owner, String type, Date date)
+    public List<Exercise> getExercisesByOwnerAndTypeAndDateGt(String owner, String type, Date date)
     {
-        Query searchChallenge = new Query(Criteria.where("owner").is(owner).and("type").is(type).and("date").
+        Query searchExercise = new Query(Criteria.where("owner").is(owner).and("type").is(type).and("date").
                 gt(date.getTime()));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public List<Challenge> getChallengesByOwnerAndTypeAndDateLt(String owner, String type, Date date)
+    public List<Exercise> getExercisesByOwnerAndTypeAndDateLt(String owner, String type, Date date)
     {
-        Query searchChallenge = new Query(Criteria.where("owner").is(owner).and("type").is(type).and("date").
+        Query searchExercise = new Query(Criteria.where("owner").is(owner).and("type").is(type).and("date").
                 lt(date.getTime()));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public List<Challenge> getChallengesByOwnerAndTypeAndDateInterval(String owner, String type, Date date1, Date date2)
+    public List<Exercise> getExercisesByOwnerAndTypeAndDateInterval(String owner, String type, Date date1, Date date2)
     {
-        Query searchChallenge = new Query(Criteria.where("owner").is(owner).and("type").is(type).and("date").
+        Query searchExercise = new Query(Criteria.where("owner").is(owner).and("type").is(type).and("date").
                 gt(date1.getTime()).and("date").lt(date2.getTime()));
-        List<Challenge> resultChallenges = mongoTemplate.query(Challenge.class).matching(searchChallenge).all();
-        return resultChallenges;
+        List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
+        return resultExercises;
     }
 
-    public void deleteChallenge(String owner, String type, Date date)
+    public void deleteExercise(String owner, String type, Date date)
     {
-        Challenge challenge = getChallengeByOwnerAndTypeAndDate(owner, type, date);
-        mongoTemplate.remove(challenge);
+        Exercise Exercise = getExerciseByOwnerAndTypeAndDate(owner, type, date);
+        mongoTemplate.remove(Exercise);
     }
 
 
