@@ -52,19 +52,15 @@ public class LoginPage extends VerticalLayout {
 
         //creating Register form Dialogue box to show when a new user is registering
         Button confirmRegistrationButton = new Button("Confirm Registration");
-        confirmRegistrationButton.addClickListener(var -> {
 
-        });
         FormLayout registerFormLayout = new FormLayout();
 
         //registerFormLayout.addFormItem(registerEmailField, "");
         //registerFormLayout.addFormItem(registerPasswordField, "");
         HLRegister.add(registerEmailField, registerPasswordField);
-        HLRegister.setDefaultVerticalComponentAlignment(
-                FlexComponent.Alignment.CENTER);
+        HLRegister.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         VLRegister.add(confirmRegistrationButton);
-        VLRegister.setDefaultHorizontalComponentAlignment(
-                FlexComponent.Alignment.CENTER);
+        VLRegister.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         //Dialog registerForm = new Dialog(registerEmailField, registerPasswordField);
         //Dialog registerForm = new Dialog(registerFormLayout, confirmRegistrationButton);
         Dialog registerForm = new Dialog(HLRegister, VLRegister);
@@ -72,12 +68,20 @@ public class LoginPage extends VerticalLayout {
         registerForm.setCloseOnOutsideClick(true);
         registerForm.setSizeFull();
 
+        confirmRegistrationButton.addClickListener(var -> {
+            if(registerPasswordField.getValue() != null) {
+                database.insertUser(registerEmailField.getValue(), registerPasswordField.getValue());
+                registerForm.close();
+            }
+        });
+
         //creating and handling buttons
         Button loginButton = new Button("Login");
         Button registerButton = new Button("Register");
         loginButton.addClickListener(var -> {
             loginButton.getUI().ifPresent(ui ->
-                    ui.navigate("exercise"));
+                    ui.navigate("group"));
+
         });
         registerButton.addClickListener(var -> {
             registerForm.open();
@@ -86,8 +90,7 @@ public class LoginPage extends VerticalLayout {
 
         //displaying components on web page
         VL.add(loginEmailField, loginPasswordField, loginButton, registerButton);
-        VL.setDefaultHorizontalComponentAlignment(
-                FlexComponent.Alignment.CENTER);
+        VL.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         add(VL, HL);
     }
 
