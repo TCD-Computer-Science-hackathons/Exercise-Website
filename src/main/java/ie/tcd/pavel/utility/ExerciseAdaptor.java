@@ -2,9 +2,9 @@ package ie.tcd.pavel.utility;
 
 import java.util.Date;
 
-public class ChallengeAdaptor {
+public class ExerciseAdaptor {
 
-    public static String getRunningInfo(String value, String unit)
+    public static String getDistanceFieldInfo(String value, String unit)
     {
         long valueInMeters = Long.valueOf(value);
         switch (unit)
@@ -19,22 +19,7 @@ public class ChallengeAdaptor {
         return  info;
     }
 
-    public static String getSwimmingInfo(String value, String unit)
-    {
-        long valueInMeters = Long.valueOf(value);
-        switch (unit)
-        {
-            case "km": valueInMeters*=1000;break;
-            case "mi": valueInMeters =(long)(valueInMeters*1609.34);break;
-            case "ft":valueInMeters =(long)(valueInMeters*0.3);break;
-            default:break;
-        }
-        String info = "value:"+value+" unit:"+unit+" valueInMeters:"+String.valueOf(valueInMeters);
-
-        return  info;
-    }
-
-    public static String getPlankInfo(String value, String unit)
+    public static String getTimeFieldInfo(String value, String unit)
     {
         long valueInMinutes = Long.valueOf(value);
         if(unit.equals("hr"))
@@ -46,7 +31,7 @@ public class ChallengeAdaptor {
         return  info;
     }
 
-    public static String getBenchPressInfo(String amount, String unit, String reps)
+    public static String getWeightFieldInfo(String amount, String unit, String reps)
     {
         long amountInKg = Long.valueOf(amount);
 
@@ -59,6 +44,12 @@ public class ChallengeAdaptor {
 
         return info;
     }
+
+    public static String getRepFieldInfo(String reps )
+    {
+        return "reps:"+reps;
+    }
+
 
     public static long getDate(Date date)
     {

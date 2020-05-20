@@ -3,11 +3,11 @@ package ie.tcd.pavel.documents;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "challenges")
-public class Challenge {
+@Document(collection = "exercises")
+public class Exercise {
 
 
-    public Challenge(String owner, String type, String information,long date)
+    public Exercise(String owner, String type, String information,long date)
     {
         this.owner = owner;
         this.type = type;
