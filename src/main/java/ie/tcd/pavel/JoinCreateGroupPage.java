@@ -3,10 +3,12 @@ package ie.tcd.pavel;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.charts.model.Label;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Input;
+import com.vaadin.flow.component.html.NativeButton;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -27,32 +29,48 @@ public class JoinCreateGroupPage extends VerticalLayout {
 		HorizontalLayout horLay = new HorizontalLayout (createGroup,joinGroup);
 		add(horLay);
 		
-		Dialog dialog = new Dialog();
-		TextField groupNameIn = new TextField();
-		TextField groupPassIn = new TextField();
-		TextField newGroupNameIn = new TextField();
-		TextField newGroupPassIn = new TextField();
-		Div head1 = new Div();
-		Div head2 = new Div();
+		Dialog dialog1 = new Dialog();
+		Dialog dialog2 = new Dialog();
+		TextField entry1 = new TextField();
+		TextField entry2 = new TextField();
+		TextField entry3 = new TextField();
+		TextField entry4 = new TextField();
+		Div newGroupName = new Div();
+		Div newGroupPass = new Div();
+		Div joinGroupName = new Div();
+		Div joinGroupPass = new Div();
+		newGroupName.setText("Enter new Group's name: ");
+		newGroupPass.setText("Enter new Group's password: ");
+		joinGroupName.setText("Enter name of group you would like to join: ");
+		joinGroupPass.setText("Enter password: ");
 		
-		VerticalLayout verLay = new VerticalLayout (head1,groupNameIn,head2,groupPassIn,confirm);
-		dialog.add(verLay);
+		VerticalLayout verLay1 = new VerticalLayout (newGroupName,entry1,newGroupPass,entry2);
+		VerticalLayout verLay2 = new VerticalLayout (joinGroupName,entry3,joinGroupPass,entry4);
 		
-		dialog.setWidth("400px");
-		dialog.setHeight("200px");
+		dialog1.setWidth("400px");
+		dialog1.setHeight("300px");
+		dialog2.setWidth("400px");
+		dialog2.setHeight("300px");
 
 		createGroup.addClickListener(event -> {
-			head1.setText("Enter new group Name");
-			head2.setText("Enter password for new group");
-		    dialog.open();
-		    groupNameIn.getElement().callJsFunction("focus");
+		    dialog1.open();
+			dialog1.add(verLay1);
+			dialog1.add(confirm);
+			confirm.addClickListener( event1 -> {
+			    dialog1.close();
+			    
+			});
+		    
 		});
 		
 		joinGroup.addClickListener(event -> {
-			head1.setText("Enter name of group you would like to join");
-			head2.setText("Enter password of group you would like to join");
-		    dialog.open();
-		    groupNameIn.getElement().callJsFunction("focus");
+		    dialog2.open();
+		    dialog2.add(verLay2);
+		    dialog2.add(confirm);
+			confirm.addClickListener( event1 -> {
+			    dialog2.close();
+			    
+			});
 		});
 		
 		
