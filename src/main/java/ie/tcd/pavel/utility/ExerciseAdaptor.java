@@ -26,7 +26,7 @@ public class ExerciseAdaptor {
         {
             valueInMinutes*=60;
         }
-        String info = "value:"+value+" unit:"+unit+" valueInMeters:"+String.valueOf(valueInMinutes);
+        String info = "value:"+value+" unit:"+unit+" valueInMinutes:"+String.valueOf(valueInMinutes);
 
         return  info;
     }
@@ -50,6 +50,29 @@ public class ExerciseAdaptor {
         return "reps:"+reps;
     }
 
+    public static double getDistanceValue(String info)
+    {
+        String[] parts = info.split(":| ");
+        return Double.valueOf(parts[parts.length-1]);
+    }
+
+    public static double getTimeValue(String info)
+    {
+        String[] parts = info.split(":| ");
+        return Double.valueOf(parts[parts.length-1]);
+    }
+
+    public static double getWeightValue(String info)
+    {
+        String[] parts = info.split(":| ");
+        return Double.valueOf(parts[parts.length-1])*Double.valueOf(parts[parts.length-3]);
+    }
+
+    public static double getRepsValue(String info)
+    {
+        String[] parts = info.split(":| ");
+        return Double.valueOf(parts[parts.length-1]);
+    }
 
     public static long getDate(Date date)
     {

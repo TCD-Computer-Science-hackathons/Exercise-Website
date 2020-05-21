@@ -8,6 +8,8 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import ie.tcd.pavel.utility.ExerciseTypes;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Hashtable;
 
@@ -17,13 +19,11 @@ public class AddExerciseButton extends Button {
     private final VerticalLayout fakeDatabase = new VerticalLayout();
     private final ErrorField errorField = new ErrorField("Error");
     private String currentExercise = "Running";
+    @Autowired ExerciseTypes exerciseTypes;
 
     public AddExerciseButton(String text) {
         super(text);
-
-        String[] exercises = new String[] {"Running", "Swimming", "Plank", "Bench Press", "Push Ups", "Lunges", "Weighted Squats", "Squats", "Overhead Dumbbell Press",
-                "Dumbbell Rows", "Deadlift", "Burpees", "Sit Ups", "Skipping", "Cycling", "Pull Ups"};
-
+        String [] exercises = exerciseTypes.getExerciseTypes();
         // Create a HashTable filled with exercise fields
         int i = 0;
         DistanceField runningField = new DistanceField(exercises[i]);

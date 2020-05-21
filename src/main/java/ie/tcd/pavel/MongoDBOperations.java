@@ -1,6 +1,8 @@
 package ie.tcd.pavel;
 
-import ie.tcd.pavel.documents.Exercise;
+import ie.tcd.pavel.documents.*;
+import ie.tcd.pavel.utility.ExerciseAdaptor;
+import ie.tcd.pavel.utility.ExerciseTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -8,10 +10,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import ie.tcd.pavel.documents.User;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -19,12 +22,15 @@ public class MongoDBOperations {
 
     @Autowired
     MongoTemplate mongoTemplate;
+    @Autowired
+    ExerciseTypes exerciseTypes;
 
     public void insertUser(String login, String password) {
-        mongoTemplate.insert(new User(login, password));
+        mongoTemplate.insert(new User(login));
+        mongoTemplate.insert(new UserPassword(login,password));
     }
 
-    public User searchUserByLogin(String login) {
+    public User getUserByLogin(String login) {
 
         Query searchUser = new Query(Criteria.where("login").is(login));
         User user = mongoTemplate.findOne(searchUser, User.class);
@@ -34,12 +40,13 @@ public class MongoDBOperations {
 
     public boolean userExists(String login, String password)
     {
-        Query searchUser = new Query(Criteria.where("login").is(login).and("password").is(password));
-        List<User> resultUsers = mongoTemplate.query(User.class).matching(searchUser).all();
+        Query searchUserPassword = new Query(Criteria.where("login").is(login).and("password").
+                is(org.apache.commons.codec.digest.DigestUtils.sha256Hex(password)));
+        List<UserPassword> resultUsers = mongoTemplate.query(UserPassword.class).matching(searchUserPassword).all();
         return resultUsers.size() > 0;
     }
 
-    public List<User> searchUserByName(String forename, String surname) {
+    public List<User> getUserByName(String forename, String surname) {
 
         Query searchUser = new Query(Criteria.where("forename").is(forename).and("surname").is(surname));
         List<User> resultUsers = mongoTemplate.query(User.class).matching(searchUser).all();
@@ -47,8 +54,11 @@ public class MongoDBOperations {
     }
 
     public void deleteUserByLogin(String login) {
-        User user = searchUserByLogin(login);
+        User user = getUserByLogin(login);
+        Query searchUserPassword = new Query(Criteria.where("login").is(login));
+        UserPassword userPassword = mongoTemplate.findOne(searchUserPassword,UserPassword.class);
         mongoTemplate.remove(user);
+        mongoTemplate.remove(userPassword);
     }
 
     public void insertExercise(String owner, String type, String information, long date) {
@@ -158,6 +168,119 @@ public class MongoDBOperations {
         Exercise Exercise = getExerciseByOwnerAndTypeAndDate(owner, type, date);
         mongoTemplate.remove(Exercise);
     }
+
+    public void insertGroup(String name, String password, String user)
+    {
+        mongoTemplate.insert(new Group(name,user));
+        mongoTemplate.insert(new GroupPassword(name,org.apache.commons.codec.digest.DigestUtils.sha256Hex(password)));
+    }
+
+    public boolean groupExists(String name, String password)
+    {
+        Query searchGroupPassword = new Query(Criteria.where("name").is(name).and("password").
+                is(org.apache.commons.codec.digest.DigestUtils.sha256Hex(password)));
+        List<GroupPassword> resultGroups = mongoTemplate.query(GroupPassword.class).matching(searchGroupPassword).all();
+        return resultGroups.size() > 0;
+    }
+
+
+    public List<Group> getGroupsByUser(String user)
+    {
+        Query searchGroup = new Query(Criteria.where("user").is(user));
+        List<Group> resultGroups = mongoTemplate.query(Group.class).matching(searchGroup).all();
+        return resultGroups;
+    }
+
+    public List<User> getUsersByGroup(String group)
+    {
+        Query searchGroup = new Query(Criteria.where("name").is(group));
+        List<Group> resultGroup = mongoTemplate.query(Group.class).matching(searchGroup).all();
+        List<User> users = new ArrayList<>();
+        for (Group gr: resultGroup) {
+            users.add(getUserByLogin(gr.getName()));
+        }
+        return users;
+    }
+
+    public HashMap<User,List<Exercise>> inGroupGetExercisesByUsersAndType(String group,String type)
+    {
+        List<User> users = getUsersByGroup(group);
+        HashMap<User, List<Exercise>> allUsersExercises = new HashMap<User, List<Exercise>>();
+        for(User user:users){
+            List<Exercise> exercises = getExercisesByTypeAndOwner(user.getLogin(),type);
+            allUsersExercises.put(user,exercises);
+        }
+        return allUsersExercises;
+    }
+
+
+    //returns total time in minutes or total distance in km or total reps or total weight in kg
+    public HashMap<User,Double> inGroupGetCumulativeValuesByUserAndType(String group, String type)
+    {
+        HashMap<User, List<Exercise>> allUsersExercises = inGroupGetExercisesByUsersAndType(group,type);
+        HashMap<User,Double> cumulativeData = new HashMap<User,Double>();
+        if(exerciseTypes.getDistanceExercises().contains(type))
+        {
+            for(User user:allUsersExercises.keySet())
+            {
+                double currentValue = 0;
+                List<Exercise> exercises = allUsersExercises.get(user);
+                for(Exercise exercise: exercises)
+                {
+                    currentValue+= ExerciseAdaptor.getDistanceValue(exercise.getInformation());
+                }
+                cumulativeData.put(user,currentValue);
+            }
+        }
+        else if(exerciseTypes.getRepExercises().contains(type))
+        {
+            for(User user:allUsersExercises.keySet())
+            {
+                double currentValue = 0;
+                List<Exercise> exercises = allUsersExercises.get(user);
+                for(Exercise exercise: exercises)
+                {
+                    currentValue+= ExerciseAdaptor.getRepsValue(exercise.getInformation());
+                }
+                cumulativeData.put(user,currentValue);
+            }
+        }
+        else if(exerciseTypes.getWeightExercises().contains(type))
+        {
+            for(User user:allUsersExercises.keySet())
+            {
+                double currentValue = 0;
+                List<Exercise> exercises = allUsersExercises.get(user);
+                for(Exercise exercise: exercises)
+                {
+                    currentValue+= ExerciseAdaptor.getWeightValue(exercise.getInformation());
+                }
+                cumulativeData.put(user,currentValue);
+            }
+        }
+        else if(exerciseTypes.getTimeExercises().contains(type))
+        {
+            for(User user:allUsersExercises.keySet())
+            {
+                double currentValue = 0;
+                List<Exercise> exercises = allUsersExercises.get(user);
+                for(Exercise exercise: exercises)
+                {
+                    currentValue+= ExerciseAdaptor.getTimeValue(exercise.getInformation());
+                }
+                cumulativeData.put(user,currentValue);
+            }
+        }
+
+        return  cumulativeData;
+    }
+
+
+
+
+
+
+
 
 
 
