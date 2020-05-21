@@ -18,6 +18,7 @@ import ie.tcd.pavel.utility.ExerciseTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
 
+import java.sql.Time;
 import java.util.Date;
 import java.util.Hashtable;
 
@@ -100,10 +101,41 @@ public class AddExerciseButton extends Button {
 
         // Click listeners for cancel and confirm
         confirm.addClickListener(e -> {
-            // TODO: Add the exercise to database
-            String data = getCustomField(exercise.getValue()).getValue();
+            String data = exerciseFields.get(exercise.getValue()).getValue();
             if(data != null) {
-                database.insertExercise(TemporarySessionHandler.checkCurrentUser(), exercise.getValue(), ExerciseAdaptor.getDistanceFieldInfo(((DistanceField) getCustomField(exercise.getValue())).getDistance(), ((DistanceField) getCustomField(exercise.getValue())).getUnit()), new Date().getTime());
+                if(exerciseFields.get(exercise.getValue()) instanceof DistanceField) {
+                    DistanceField distanceField = (DistanceField) getCustomField(exercise.getValue());
+                    System.out.printf("Param 1: %s Param 2: %s Param 3: %s Param 4: %s%n", TemporarySessionHandler.checkCurrentUser(), exercise.getValue(), ExerciseAdaptor.getDistanceFieldInfo(distanceField.getDistance(), distanceField.getUnit()), new Date().getTime());
+                    database.insertExercise(TemporarySessionHandler.checkCurrentUser(),
+                        exercise.getValue(),
+                        ExerciseAdaptor.getDistanceFieldInfo(distanceField.getDistance(), distanceField.getUnit()),
+                        new Date().getTime());
+                    System.out.printf("%s: Added %s%s at %s to %s%n", exercise.getValue(), distanceField.getDistance(), distanceField.getUnit(), new Date().getTime(), TemporarySessionHandler.checkCurrentUser());
+
+                } else if(exerciseFields.get(exercise.getValue()) instanceof RepField) {
+                    RepField repField = (RepField) getCustomField(exercise.getValue());
+                    database.insertExercise(TemporarySessionHandler.checkCurrentUser(),
+                        exercise.getValue(),
+                        ExerciseAdaptor.getRepFieldInfo(repField.getReps()),
+                        new Date().getTime());
+                    System.out.printf("%s: Added %s reps at %s to %s%n", exercise.getValue(), repField.getReps(), new Date().getTime(), TemporarySessionHandler.checkCurrentUser());
+
+                } else if(exerciseFields.get(exercise.getValue()) instanceof TimeField) {
+                    TimeField timeField = (TimeField) getCustomField(exercise.getValue());
+                    database.insertExercise(TemporarySessionHandler.checkCurrentUser(),
+                            exercise.getValue(),
+                            ExerciseAdaptor.getTimeFieldInfo(timeField.getTime(), timeField.getUnit()),
+                            new Date().getTime());
+                    System.out.printf("%s: Added %s%s at %s to %s%n", exercise.getValue(), timeField.getTime(), timeField.getUnit(), new Date().getTime(), TemporarySessionHandler.checkCurrentUser());
+
+                } else if(exerciseFields.get(exercise.getValue()) instanceof WeightField) {
+                    WeightField weightField = (WeightField) getCustomField(exercise.getValue());
+                    database.insertExercise(TemporarySessionHandler.checkCurrentUser(),
+                            exercise.getValue(),
+                            ExerciseAdaptor.getWeightFieldInfo(weightField.getWeight(), weightField.getUnit(), weightField.getReps()),
+                            new Date().getTime());
+                    System.out.printf("%s: Added %s%s for %s reps at %s to %s%n", exercise.getValue(), weightField.getWeight(), weightField.getUnit(), weightField.getReps(), new Date().getTime(), TemporarySessionHandler.checkCurrentUser());
+                }
                 dialog.close();
             }
         });
