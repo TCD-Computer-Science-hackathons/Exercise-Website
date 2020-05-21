@@ -21,6 +21,7 @@ public class JoinCreateGroupPage extends VerticalLayout {
 	
 	public JoinCreateGroupPage()
 	{
+
 		Button createGroup = new Button ("Create a Group");
 		Button joinGroup = new Button ("Join a Group");
 		Button confirm = new Button ("Confirm");

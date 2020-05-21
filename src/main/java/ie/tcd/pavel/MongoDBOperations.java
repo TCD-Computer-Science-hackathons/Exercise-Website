@@ -38,6 +38,11 @@ public class MongoDBOperations {
 
     }
 
+    public boolean userEmailExists(String login) {
+        User user = getUserByLogin(login);
+        return user != null;
+    }
+
     public boolean userExists(String login, String password)
     {
         Query searchUserPassword = new Query(Criteria.where("login").is(login).and("password").

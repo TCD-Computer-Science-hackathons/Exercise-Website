@@ -1,5 +1,10 @@
 package ie.tcd.pavel;
 
+import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.server.VaadinSession;
 import ie.tcd.pavel.exercisefields.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.customfield.CustomField;
@@ -8,22 +13,30 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import ie.tcd.pavel.utility.ExerciseAdaptor;
 import ie.tcd.pavel.utility.ExerciseTypes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Distance;
 
+import java.util.Date;
 import java.util.Hashtable;
 
 public class AddExerciseButton extends Button {
 
     private Hashtable<String, CustomField<String>> exerciseFields = new Hashtable<>();
-    private final VerticalLayout fakeDatabase = new VerticalLayout();
     private final ErrorField errorField = new ErrorField("Error");
     private String currentExercise = "Running";
     @Autowired ExerciseTypes exerciseTypes;
+    @Autowired MongoDBOperations database;
 
     public AddExerciseButton(String text) {
         super(text);
-        String [] exercises = exerciseTypes.getExerciseTypes();
+        // TODO: Caused a null pointer exception
+        //String[] exercises = exerciseTypes.getExerciseTypes();
+
+        String[] exercises = new String[] {"Running", "Swimming", "Plank", "Bench Press", "Push Ups", "Lunges", "Weighted Squats", "Squats", "Overhead Dumbbell Press",
+                "Dumbbell Rows", "Deadlift", "Burpees", "Sit Ups", "Skipping", "Cycling", "Pull Ups"};
+
         // Create a HashTable filled with exercise fields
         int i = 0;
         DistanceField runningField = new DistanceField(exercises[i]);
@@ -90,7 +103,7 @@ public class AddExerciseButton extends Button {
             // TODO: Add the exercise to database
             String data = getCustomField(exercise.getValue()).getValue();
             if(data != null) {
-                fakeDatabase.add(new Label(exercise.getValue() + ": " + data));
+                database.insertExercise(TemporarySessionHandler.checkCurrentUser(), exercise.getValue(), ExerciseAdaptor.getDistanceFieldInfo(((DistanceField) getCustomField(exercise.getValue())).getDistance(), ((DistanceField) getCustomField(exercise.getValue())).getUnit()), new Date().getTime());
                 dialog.close();
             }
         });
@@ -114,9 +127,5 @@ public class AddExerciseButton extends Button {
             return exerciseFields.get(exerciseField);
         }
         return errorField;
-    }
-
-    public VerticalLayout getFakeDatabase() {
-        return fakeDatabase;
     }
 }

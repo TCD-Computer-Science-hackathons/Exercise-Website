@@ -14,7 +14,7 @@ public class ErrorField extends CustomField<String> {
 
     @Override
     protected String generateModelValue() {
-        return "Error";
+        return null;
     }
 
     @Override
@@ -24,6 +24,6 @@ public class ErrorField extends CustomField<String> {
 
     @Override
     public String getValue() {
-        return "Error Field Value";
+        return null;
     }
 }

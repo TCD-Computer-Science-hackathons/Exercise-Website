@@ -16,6 +16,7 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("")
@@ -69,7 +70,7 @@ public class LoginPage extends VerticalLayout {
         registerForm.setSizeFull();
 
         confirmRegistrationButton.addClickListener(var -> {
-            if(registerPasswordField.getValue() != null) {
+            if(registerPasswordField.getValue() != null && database.userEmailExists(registerEmailField.getValue())) {
                 database.insertUser(registerEmailField.getValue(), registerPasswordField.getValue());
                 registerForm.close();
                 VL.add(new Label("User registered successfully!"));
@@ -81,6 +82,7 @@ public class LoginPage extends VerticalLayout {
         Button registerButton = new Button("Register");
         loginButton.addClickListener(var -> {
             if(database.userExists(loginEmailField.getValue(), loginPasswordField.getValue())) {
+                TemporarySessionHandler.bindUserToSession(loginEmailField.getValue());
                 loginButton.getUI().ifPresent(ui ->
                         ui.navigate("group"));
             }

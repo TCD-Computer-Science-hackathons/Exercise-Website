@@ -11,6 +11,7 @@ public class AddExercisePage extends VerticalLayout {
     MongoDBOperations database;
 
     public AddExercisePage() {
+
         AddExerciseButton addExerciseButton = new AddExerciseButton("Add Exercise");
         add(addExerciseButton);
     }

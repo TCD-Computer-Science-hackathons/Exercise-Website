@@ -26,6 +26,7 @@ public class ExerciseChartsPage extends VerticalLayout {
 	private int groupSize= 6;
 	
     public ExerciseChartsPage() {
+
     	String[] exercises= new String[] {"Running", "Swimming", "Plank", "Bench Press", "Push Ups", "Lunges", "Weighted Squats", "Squats", "Overhead Dumbbell Press",
                 "Dumbbell Rows", "Deadlift", "Burpees", "Sit Ups", "Skipping", "Cycling", "Pull Ups"};   
     	int[] dataMember1= new int[] {200, 300, 22, 4, 400, 340, 6};
