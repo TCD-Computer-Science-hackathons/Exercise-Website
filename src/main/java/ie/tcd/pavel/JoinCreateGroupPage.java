@@ -51,7 +51,7 @@ public class JoinCreateGroupPage extends VerticalLayout {
 		dialog1.setHeight("300px");
 		dialog2.setWidth("400px");
 		dialog2.setHeight("300px");
-
+//
 		createGroup.addClickListener(event -> {
 		    dialog1.open();
 			dialog1.add(verLay1);
