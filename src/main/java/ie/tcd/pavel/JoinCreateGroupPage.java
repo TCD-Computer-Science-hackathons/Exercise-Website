@@ -21,8 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route("group")
 public class JoinCreateGroupPage extends VerticalLayout {
 
+	MongoDBOperations database;
+	private boolean isNewGroup = false;
+
 	public JoinCreateGroupPage()
 	{
+
+		database = BeanUtil.getBean(MongoDBOperations.class);
 		Button createGroup = new Button ("Create a Group");
 		Button joinGroup = new Button ("Join a Group");
 		Button confirm = new Button ("Confirm");
@@ -31,10 +36,10 @@ public class JoinCreateGroupPage extends VerticalLayout {
 
 		Dialog dialog1 = new Dialog();
 		Dialog dialog2 = new Dialog();
-		TextField entry1 = new TextField();
-		TextField entry2 = new TextField();
-		TextField entry3 = new TextField();
-		TextField entry4 = new TextField();
+		TextField newGroupNameField = new TextField();
+		TextField newGroupPassField = new TextField();
+		TextField joinGroupNameField = new TextField();
+		TextField joinGroupPassField = new TextField();
 		Div newGroupName = new Div();
 		Div newGroupPass = new Div();
 		Div joinGroupName = new Div();
@@ -44,21 +49,34 @@ public class JoinCreateGroupPage extends VerticalLayout {
 		joinGroupName.setText("Enter name of group you would like to join: ");
 		joinGroupPass.setText("Enter password: ");
 
-		VerticalLayout verLay1 = new VerticalLayout (newGroupName,entry1,newGroupPass,entry2);
-		VerticalLayout verLay2 = new VerticalLayout (joinGroupName,entry3,joinGroupPass,entry4);
+		VerticalLayout verLay1 = new VerticalLayout (newGroupName,newGroupNameField,newGroupPass,newGroupPassField);
+		VerticalLayout verLay2 = new VerticalLayout (joinGroupName,joinGroupNameField,joinGroupPass,joinGroupPassField);
 
 		dialog1.setWidth("400px");
 		dialog1.setHeight("300px");
 		dialog2.setWidth("400px");
 		dialog2.setHeight("300px");
+
+		confirm.addClickListener(buttonClickEvent -> {
+			if(isNewGroup) {
+
+			} else {
+
+			}
+		});
 //
 		createGroup.addClickListener(event -> {
 			dialog1.open();
 			dialog1.add(verLay1);
 			dialog1.add(confirm);
 			confirm.addClickListener( event1 -> {
-				dialog1.close();
-
+				// User is creating a new group
+				if(newGroupNameField.getValue() != null && newGroupPassField.getValue() != null) {
+					if(!database.groupExists(newGroupNameField.getValue())) {
+						database.insertGroup(newGroupNameField.getValue(), newGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
+						dialog1.close();
+					}
+				}
 			});
 
 		});
@@ -68,7 +86,13 @@ public class JoinCreateGroupPage extends VerticalLayout {
 			dialog2.add(verLay2);
 			dialog2.add(confirm);
 			confirm.addClickListener( event1 -> {
-				dialog2.close();
+				// User is attempting to join a group
+				if(joinGroupNameField.getValue() != null && joinGroupPassField.getValue() != null) {
+					if (database.groupExists(joinGroupNameField.getValue(), joinGroupPassField.getValue())) {
+						database.insertGroup(joinGroupNameField.getValue(), joinGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
+						dialog2.close();
+					}
+				}
 
 			});
 		});
