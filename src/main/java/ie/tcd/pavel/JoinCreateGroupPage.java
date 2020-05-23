@@ -1,9 +1,11 @@
 package ie.tcd.pavel;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.charts.model.Label;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
@@ -30,7 +32,9 @@ public class JoinCreateGroupPage extends VerticalLayout {
 		database = BeanUtil.getBean(MongoDBOperations.class);
 		Button createGroup = new Button ("Create a Group");
 		Button joinGroup = new Button ("Join a Group");
-		Button confirm = new Button ("Confirm");
+		Button confirmCreateGroup = new Button ("Confirm");
+		Button confirmJoinGroup = new Button("Confirm");
+
 		HorizontalLayout horLay = new HorizontalLayout (createGroup,joinGroup);
 		add(horLay);
 
@@ -40,65 +44,62 @@ public class JoinCreateGroupPage extends VerticalLayout {
 		TextField newGroupPassField = new TextField();
 		TextField joinGroupNameField = new TextField();
 		TextField joinGroupPassField = new TextField();
-		Div newGroupName = new Div();
-		Div newGroupPass = new Div();
-		Div joinGroupName = new Div();
-		Div joinGroupPass = new Div();
-		newGroupName.setText("Enter new Group's name: ");
-		newGroupPass.setText("Enter new Group's password: ");
-		joinGroupName.setText("Enter name of group you would like to join: ");
-		joinGroupPass.setText("Enter password: ");
+		newGroupNameField.getStyle().set("width", "15em");
+		newGroupNameField.setMaxLength(13);
+		newGroupNameField.setLabel("New Group Name: ");
+		newGroupPassField.getStyle().set("width", "15em");
+		newGroupPassField.setMaxLength(13);
+		newGroupPassField.setLabel("New Group Password: ");
+		joinGroupNameField.getStyle().set("width", "15em");
+		joinGroupNameField.setMaxLength(13);
+		joinGroupNameField.setLabel("Group Name: ");
+		joinGroupPassField.getStyle().set("width", "15em");
+		joinGroupPassField.setMaxLength(13);
+		joinGroupPassField.setLabel("Group Password: ");
 
-		VerticalLayout verLay1 = new VerticalLayout (newGroupName,newGroupNameField,newGroupPass,newGroupPassField);
-		VerticalLayout verLay2 = new VerticalLayout (joinGroupName,joinGroupNameField,joinGroupPass,joinGroupPassField);
+		Label errorLabel = new Label();
+		VerticalLayout verLay1 = new VerticalLayout (newGroupNameField, newGroupPassField, confirmCreateGroup, errorLabel);
+		VerticalLayout verLay2 = new VerticalLayout (joinGroupNameField, joinGroupPassField, confirmJoinGroup, errorLabel);
 
-		dialog1.setWidth("400px");
-		dialog1.setHeight("300px");
-		dialog2.setWidth("400px");
-		dialog2.setHeight("300px");
+		dialog1.add(verLay1);
+		dialog2.add(verLay2);
 
-		confirm.addClickListener(buttonClickEvent -> {
-			if(isNewGroup) {
-
+		confirmCreateGroup.addClickListener( event1 -> {
+			// User is creating a new group
+			if(newGroupNameField.getValue() != null && newGroupPassField.getValue() != null) {
+				if(!database.groupExists(newGroupNameField.getValue())) {
+					database.insertGroup(newGroupNameField.getValue(), newGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
+					dialog1.close();
+				} else {
+					errorLabel.setText("Group Name already exists");
+				}
 			} else {
-
+				errorLabel.setText("Group Name/Password is blank");
 			}
 		});
-//
+
+		confirmJoinGroup.addClickListener( event1 -> {
+			// User is attempting to join a group
+			if(joinGroupNameField.getValue() != null && joinGroupPassField.getValue() != null) {
+				if (database.groupExists(joinGroupNameField.getValue(), joinGroupPassField.getValue())) {
+					database.insertGroup(joinGroupNameField.getValue(), joinGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
+					dialog2.close();
+				} else {
+					errorLabel.setText("Invalid Group Name/Password");
+				}
+			} else {
+				errorLabel.setText("Group Name/Password is blank");
+			}
+		});
+
 		createGroup.addClickListener(event -> {
 			dialog1.open();
-			dialog1.add(verLay1);
-			dialog1.add(confirm);
-			confirm.addClickListener( event1 -> {
-				// User is creating a new group
-				if(newGroupNameField.getValue() != null && newGroupPassField.getValue() != null) {
-					if(!database.groupExists(newGroupNameField.getValue())) {
-						database.insertGroup(newGroupNameField.getValue(), newGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
-						dialog1.close();
-					}
-				}
-			});
-
+			errorLabel.setText("");
 		});
 
 		joinGroup.addClickListener(event -> {
 			dialog2.open();
-			dialog2.add(verLay2);
-			dialog2.add(confirm);
-			confirm.addClickListener( event1 -> {
-				// User is attempting to join a group
-				if(joinGroupNameField.getValue() != null && joinGroupPassField.getValue() != null) {
-					if (database.groupExists(joinGroupNameField.getValue(), joinGroupPassField.getValue())) {
-						database.insertGroup(joinGroupNameField.getValue(), joinGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
-						dialog2.close();
-					}
-				}
-
-			});
+			errorLabel.setText("");
 		});
-
-
-
-
 	}
 }
