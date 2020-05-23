@@ -18,6 +18,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 
 @Route("")
 @PWA(name = "Exercise Website",
@@ -30,10 +31,13 @@ public class LoginPage extends VerticalLayout {
     VerticalLayout VLRegister = new VerticalLayout();
     HorizontalLayout HL = new HorizontalLayout();
     HorizontalLayout HLRegister = new HorizontalLayout();
-    @Autowired
+    Label errorLabel = new Label();
     MongoDBOperations database;
 
     public LoginPage() {
+
+        database = BeanUtil.getBean(MongoDBOperations.class);
+
         //creating input field components
         EmailField registerEmailField = new EmailField("Email");
         registerEmailField.setClearButtonVisible(true);
@@ -70,10 +74,16 @@ public class LoginPage extends VerticalLayout {
         registerForm.setSizeFull();
 
         confirmRegistrationButton.addClickListener(var -> {
-            if(registerPasswordField.getValue() != null && database.userEmailExists(registerEmailField.getValue())) {
-                database.insertUser(registerEmailField.getValue(), registerPasswordField.getValue());
-                registerForm.close();
-                VL.add(new Label("User registered successfully!"));
+            if(registerPasswordField.getValue() != null) {
+                if(database.userEmailExists(registerEmailField.getValue())) {
+                    database.insertUser(registerEmailField.getValue(), registerPasswordField.getValue());
+                    registerForm.close();
+                    errorLabel.setText("User registered successfully!");
+                } else {
+                    registerForm.add(new Label("Email already exists"));
+                }
+            } else {
+                registerForm.add(new Label("Password is blank"));
             }
         });
 
@@ -87,7 +97,7 @@ public class LoginPage extends VerticalLayout {
                         ui.navigate("group"));
             }
             else {
-                VL.add(new Label("Error: USER NOT FOUND"));
+                errorLabel.setText("Error: USER NOT FOUND");
             }
         });
         registerButton.addClickListener(var -> {
@@ -96,7 +106,7 @@ public class LoginPage extends VerticalLayout {
 
 
         //displaying components on web page
-        VL.add(loginEmailField, loginPasswordField, loginButton, registerButton);
+        VL.add(loginEmailField, loginPasswordField, loginButton, registerButton, errorLabel);
         VL.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         add(VL, HL);
     }
