@@ -1,13 +1,17 @@
 package ie.tcd.pavel;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.AxisTitle;
 import com.vaadin.flow.component.charts.model.ChartType;
 import com.vaadin.flow.component.charts.model.Configuration;
+import com.vaadin.flow.component.charts.model.Cursor;
 import com.vaadin.flow.component.charts.model.DataLabels;
 import com.vaadin.flow.component.charts.model.DataSeries;
 import com.vaadin.flow.component.charts.model.DataSeriesItem;
-import com.vaadin.flow.component.charts.model.ListSeries;
 import com.vaadin.flow.component.charts.model.PlotOptionsBar;
 import com.vaadin.flow.component.charts.model.PlotOptionsPie;
 import com.vaadin.flow.component.charts.model.Tooltip;
@@ -15,32 +19,81 @@ import com.vaadin.flow.component.charts.model.VerticalAlign;
 import com.vaadin.flow.component.charts.model.XAxis;
 import com.vaadin.flow.component.charts.model.YAxis;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
+import ie.tcd.pavel.documents.Group;
+import ie.tcd.pavel.documents.User;
 import ie.tcd.pavel.utility.ExerciseTypes;
 
 @Route("charts")
 public class ExerciseChartsPage extends VerticalLayout {
 
-	private int groupSize= 6;
 	ExerciseTypes exerciseTypes;
     MongoDBOperations database;
     VerticalLayout verticalLayout= new VerticalLayout();
+    HorizontalLayout horizontalLayout= new HorizontalLayout();
 	
     public ExerciseChartsPage() {
-
     	database = BeanUtil.getBean(MongoDBOperations.class);
         exerciseTypes = BeanUtil.getBean(ExerciseTypes.class);
         String[] exercises = exerciseTypes.getExerciseTypes();  
-    	int[] dataMember1= new int[] {200, 300, 22, 4, 400, 340, 6};
+    	List<Group> groups= database.getGroupsByUser(TemporarySessionHandler.getCurrentUser());
+    	User currentUser= database.getUserByLogin(TemporarySessionHandler.getCurrentUser());
+    	String currentUserString= currentUser.getForename()+ " "+ currentUser.getSurname();
+    	Group currentGroup= groups.get(0);
+    	List<User> users= database.getUsersByGroup(currentGroup.getName());  	
+    	ArrayList<String> userList= new ArrayList<String>();
+    	for(int i= 0; i<users.size(); i++)
+    	{
+    		userList.add(users.get(i).getForename()+ " "+ users.get(i).getSurname());
+    	}  
+    	String allUsersString= "";
+    	for(int i= 0; i<userList.size(); i++)
+    	{
+    		allUsersString+= userList.get(i);
+    		allUsersString+= "\n";
+    	}
+    	
+    	ComboBox<String> comboBox= new ComboBox<>();
+    	comboBox.setLabel("Exercise");
+    	comboBox.setItems(exercises);
+    	comboBox.addValueChangeListener(event ->{
+    		Chart pieChart= new Chart(ChartType.PIE);
+    		Configuration pieChartConfig= pieChart.getConfiguration();
+    		pieChartConfig.setTitle("Member Contribution");
+    		pieChartConfig.setSubTitle(comboBox.getValue());
+    		
+    		Tooltip tooltip = new Tooltip();
+            tooltip.setValueDecimals(1);
+            pieChartConfig.setTooltip(tooltip);
+            
+            PlotOptionsPie plotOptions = new PlotOptionsPie();
+            plotOptions.setAllowPointSelect(true);
+            plotOptions.setCursor(Cursor.POINTER);
+            plotOptions.setShowInLegend(true);
+            pieChartConfig.setPlotOptions(plotOptions);
+            
+            DataSeries series= new DataSeries();
+            DataSeriesItem currentUserSeries= new DataSeriesItem(currentUserString, 0);
+    	});
+    	
+    	Details memberDetails= new Details(); 
+    	memberDetails.setSummaryText("Members");
+    	memberDetails.addContent(new Text(allUsersString));
+    	
+    	verticalLayout.add(comboBox, memberDetails);
+    	
+    	//Template
+    	/*int[] dataMember1= new int[] {200, 300, 22, 4, 400, 340, 6};
     	int[] dataMember2= new int[] {0, 30, 20, 1, 40, 170, 260};
     	int[] dataMember3= new int[] {100, 0, 20, 340, 200, 300, 57};
     	int[] dataMember4= new int[] {400, 3, 20, 23, 73, 250, 168};
     	int[] dataMember5= new int[] {150, 100, 30, 73, 45, 27, 221};
     	int[] dataMember6= new int[] {70, 75, 21, 3, 47, 25, 72};
-    	String[] daysOfTheWeek= new String[] {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     	
     	//Creating a drop down menu of all the exercises
     	ComboBox<String> comboBox= new ComboBox<>();
@@ -53,15 +106,14 @@ public class ExerciseChartsPage extends VerticalLayout {
             Configuration configBarChart= barChart.getConfiguration();
             configBarChart.setTitle("Group Leaderboard");
             configBarChart.setSubTitle(comboBox.getValue());
-            barChart.getConfiguration().getChart().setType(ChartType.BAR);
-            
-            DataSeries dataSeries= new DataSeries();
+            barChart.getConfiguration().getChart().setType(ChartType.PIE);
+                       
+            DataSeries dataSeries = new DataSeries();
             dataSeries.clear();
-            for(int index= 0; index<groupSize; index++)
+            for(int index= 0; index<=groupSize; index++)
             {
-            	dataSeries.setId(daysOfTheWeek[index]);
-            	dataSeries.setData(dataMember1[index], dataMember2[index], dataMember3[index], dataMember4[index], dataMember5[index], dataMember6[index]);
-            	configBarChart.addSeries(dataSeries);        	
+            	dataSeries.setData(dataMember1[index], dataMember2[index], dataMember3[index], dataMember4[index], dataMember5[index], dataMember6[index]); 
+            	configBarChart.addSeries(dataSeries);
             }
             
             XAxis xAxis= new XAxis();
@@ -88,6 +140,6 @@ public class ExerciseChartsPage extends VerticalLayout {
             configBarChart.setPlotOptions(plotOptions);
             verticalLayout.add(barChart);
         });
-    	add(comboBox, verticalLayout);
+    	add(comboBox, verticalLayout);*/
     }
 }
