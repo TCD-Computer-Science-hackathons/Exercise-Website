@@ -21,7 +21,7 @@ public class ConfigureUIServiceInitListener implements VaadinServiceInitListener
 
     private void authenticateNavigation(BeforeEnterEvent event) {
         if (!LoginPage.class.equals(event.getNavigationTarget())
-                && TemporarySessionHandler.checkCurrentUser() == null) {
+                && TemporarySessionHandler.getCurrentUser() == null) {
             event.rerouteTo(LoginPage.class);
         }
     }

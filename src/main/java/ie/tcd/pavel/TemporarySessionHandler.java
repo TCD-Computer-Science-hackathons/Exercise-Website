@@ -8,7 +8,7 @@ public class TemporarySessionHandler {
         VaadinSession.getCurrent().setAttribute("user", login);
     }
 
-    public static String checkCurrentUser() {
+    public static String getCurrentUser() {
         return (String) VaadinSession.getCurrent().getAttribute("user");
     }
 

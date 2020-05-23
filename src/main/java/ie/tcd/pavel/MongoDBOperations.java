@@ -188,6 +188,13 @@ public class MongoDBOperations {
         return resultGroups.size() > 0;
     }
 
+    public boolean groupExists(String name)
+    {
+        Query groupExists = new Query(Criteria.where("name").is(name));
+        List<Group> groups = mongoTemplate.query(Group.class).matching(groupExists).all();
+        return groups.size()>0;
+    }
+
 
     public List<Group> getGroupsByUser(String user)
     {
