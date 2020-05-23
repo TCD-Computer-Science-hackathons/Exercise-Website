@@ -35,8 +35,10 @@ public class JoinCreateGroupPage extends VerticalLayout {
 		Button confirmCreateGroup = new Button ("Confirm");
 		Button confirmJoinGroup = new Button("Confirm");
 
+		Label debugLabel = new Label();
+
 		HorizontalLayout horLay = new HorizontalLayout (createGroup,joinGroup);
-		add(horLay);
+		add(horLay, debugLabel);
 
 		Dialog dialog1 = new Dialog();
 		Dialog dialog2 = new Dialog();
@@ -57,49 +59,64 @@ public class JoinCreateGroupPage extends VerticalLayout {
 		joinGroupPassField.setMaxLength(13);
 		joinGroupPassField.setLabel("Group Password: ");
 
-		Label errorLabel = new Label();
-		VerticalLayout verLay1 = new VerticalLayout (newGroupNameField, newGroupPassField, confirmCreateGroup, errorLabel);
-		VerticalLayout verLay2 = new VerticalLayout (joinGroupNameField, joinGroupPassField, confirmJoinGroup, errorLabel);
+		Label joinErrorLabel = new Label();
+		Label createErrorLabel = new Label();
+		VerticalLayout verLay1 = new VerticalLayout (newGroupNameField, newGroupPassField, confirmCreateGroup, createErrorLabel);
+		VerticalLayout verLay2 = new VerticalLayout (joinGroupNameField, joinGroupPassField, confirmJoinGroup, joinErrorLabel);
 
 		dialog1.add(verLay1);
 		dialog2.add(verLay2);
 
 		confirmCreateGroup.addClickListener( event1 -> {
 			// User is creating a new group
-			if(newGroupNameField.getValue() != null && newGroupPassField.getValue() != null) {
+			if(newGroupNameField.getValue() != null || newGroupPassField.getValue() != null) {
 				if(!database.groupExists(newGroupNameField.getValue())) {
 					database.insertGroup(newGroupNameField.getValue(), newGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
 					dialog1.close();
+					debugLabel.setText("Group Created Successfully");
+					System.out.printf("[DEBUG] Group Created: Name - %s | Password - %s%n", newGroupNameField.getValue(), newGroupPassField.getValue());
 				} else {
-					errorLabel.setText("Group Name already exists");
+					verLay1.remove(createErrorLabel);
+					createErrorLabel.setText("Group Name already exists");
+					verLay1.add(createErrorLabel);
+					System.out.printf("[DEBUG] Someone tried to create a group when the name already exists%n");
 				}
 			} else {
-				errorLabel.setText("Group Name/Password is blank");
+				verLay1.remove(createErrorLabel);
+				createErrorLabel.setText("Group Name/Password is blank");
+				verLay1.add(createErrorLabel);
 			}
 		});
 
 		confirmJoinGroup.addClickListener( event1 -> {
 			// User is attempting to join a group
-			if(joinGroupNameField.getValue() != null && joinGroupPassField.getValue() != null) {
+			if(joinGroupNameField.getValue() != null || joinGroupPassField.getValue() != null) {
 				if (database.groupExists(joinGroupNameField.getValue(), joinGroupPassField.getValue())) {
 					database.insertGroup(joinGroupNameField.getValue(), joinGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
 					dialog2.close();
+					debugLabel.setText("Group Joined Successfully");
+					System.out.printf("[DEBUG] Group Joined: Name - %s | Password - %s%n", joinGroupNameField.getValue(), joinGroupPassField.getValue());
 				} else {
-					errorLabel.setText("Invalid Group Name/Password");
+					verLay2.remove(joinErrorLabel);
+					joinErrorLabel.setText("Invalid Group Name/Password");
+					verLay2.add(joinErrorLabel);
+					System.out.printf("[DEBUG] Someone tried to join a group that does not exist%n");
 				}
 			} else {
-				errorLabel.setText("Group Name/Password is blank");
+				verLay2.remove(joinErrorLabel);
+				joinErrorLabel.setText("Group Name/Password is blank");
+				verLay2.add(joinErrorLabel);
 			}
 		});
 
 		createGroup.addClickListener(event -> {
+			//createErrorLabel.setText("");
 			dialog1.open();
-			errorLabel.setText("");
 		});
 
 		joinGroup.addClickListener(event -> {
+			//joinErrorLabel.setText("");
 			dialog2.open();
-			errorLabel.setText("");
 		});
 	}
 }
