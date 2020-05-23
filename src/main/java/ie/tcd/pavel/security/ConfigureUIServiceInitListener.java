@@ -6,6 +6,7 @@ import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 
 import ie.tcd.pavel.LoginPage;
+import ie.tcd.pavel.RegisterPage;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,7 +23,11 @@ public class ConfigureUIServiceInitListener implements VaadinServiceInitListener
     private void authenticateNavigation(BeforeEnterEvent event) {
         if (!LoginPage.class.equals(event.getNavigationTarget())
                 && !SecurityUtils.isUserLoggedIn()) {
-            event.rerouteTo(LoginPage.class);
+
+            if(!RegisterPage.class.equals(event.getNavigationTarget()))
+            {
+                event.rerouteTo(LoginPage.class);
+            }
         }
     }
 }
