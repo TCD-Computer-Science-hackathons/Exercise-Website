@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route("exercise")
 public class AddExercisePage extends VerticalLayout {
 
+    @Autowired
+    MongoDBOperations database;
 
     public AddExercisePage() {
 
