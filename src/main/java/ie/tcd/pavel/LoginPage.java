@@ -5,10 +5,8 @@ import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
-
 import com.vaadin.flow.router.Route;
 
-import java.util.Collections;
 
 @Route("login")
 
@@ -25,6 +23,7 @@ public class LoginPage extends VerticalLayout implements BeforeEnterObserver {
         login.setAction("login");
 
         add(new H1("Fit Together"), login);
+
     }
 
     @Override
