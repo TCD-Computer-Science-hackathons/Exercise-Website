@@ -1,6 +1,8 @@
 package ie.tcd.pavel;
 
+import com.google.common.collect.ImmutableList;
 import ie.tcd.pavel.documents.*;
+import ie.tcd.pavel.security.Role;
 import ie.tcd.pavel.utility.ExerciseAdaptor;
 import ie.tcd.pavel.utility.ExerciseTypes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +12,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class MongoDBOperations {
@@ -27,7 +27,9 @@ public class MongoDBOperations {
 
     public void insertUser(String login, String password) {
         mongoTemplate.insert(new User(login));
-        mongoTemplate.insert(new UserPassword(login,password));
+        mongoTemplate.insert(new UserPassword(login, ImmutableList.of(Role.USER),
+                new BCryptPasswordEncoder().encode(password),true,true,true,
+                true));
     }
 
     public User getUserByLogin(String login) {
@@ -39,16 +41,23 @@ public class MongoDBOperations {
     }
 
     public boolean userEmailExists(String login) {
-        User user = getUserByLogin(login);
-        return user != null;
+        Query searchUser = new Query(Criteria.where("login").is(login));
+        List<User> resultUsers = mongoTemplate.query(User.class).matching(searchUser).all();
+        return resultUsers.size()>0;
     }
 
     public boolean userExists(String login, String password)
     {
         Query searchUserPassword = new Query(Criteria.where("login").is(login).and("password").
-                is(org.apache.commons.codec.digest.DigestUtils.sha256Hex(password)));
+                is( new BCryptPasswordEncoder().encode(password)));
         List<UserPassword> resultUsers = mongoTemplate.query(UserPassword.class).matching(searchUserPassword).all();
         return resultUsers.size() > 0;
+    }
+
+    public Optional<UserPassword> getUserPasswordByLogin(String login)
+    {
+        return Optional.ofNullable(mongoTemplate.findOne(new Query( Criteria.where("login").is(login)),
+                UserPassword.class));
     }
 
     public List<User> getUserByName(String forename, String surname) {
@@ -177,13 +186,13 @@ public class MongoDBOperations {
     public void insertGroup(String name, String password, String user)
     {
         mongoTemplate.insert(new Group(name,user));
-        mongoTemplate.insert(new GroupPassword(name,org.apache.commons.codec.digest.DigestUtils.sha256Hex(password)));
+        mongoTemplate.insert(new GroupPassword(name,new BCryptPasswordEncoder().encode(password)));
     }
 
     public boolean groupExists(String name, String password)
     {
         Query searchGroupPassword = new Query(Criteria.where("name").is(name).and("password").
-                is(org.apache.commons.codec.digest.DigestUtils.sha256Hex(password)));
+                is(new BCryptPasswordEncoder().encode(password)));
         List<GroupPassword> resultGroups = mongoTemplate.query(GroupPassword.class).matching(searchGroupPassword).all();
         return resultGroups.size() > 0;
     }

@@ -1,11 +1,11 @@
-package ie.tcd.pavel.utility;
+package ie.tcd.pavel.security;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
+
 import ie.tcd.pavel.LoginPage;
-import ie.tcd.pavel.TemporarySessionHandler;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,7 +21,7 @@ public class ConfigureUIServiceInitListener implements VaadinServiceInitListener
 
     private void authenticateNavigation(BeforeEnterEvent event) {
         if (!LoginPage.class.equals(event.getNavigationTarget())
-                && TemporarySessionHandler.getCurrentUser() == null) {
+                && !SecurityUtils.isUserLoggedIn()) {
             event.rerouteTo(LoginPage.class);
         }
     }

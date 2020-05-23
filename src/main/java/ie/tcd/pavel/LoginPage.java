@@ -1,104 +1,40 @@
 package ie.tcd.pavel;
 
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
-import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.server.VaadinSession;
-import org.springframework.beans.factory.annotation.Autowired;
 
-@Route("")
-@PWA(name = "Exercise Website",
-        shortName = "Exercise Website",
-        description = "",
-        enableInstallPrompt = false)
-public class LoginPage extends VerticalLayout {
+import java.util.Collections;
 
-    VerticalLayout VL = new VerticalLayout();
-    VerticalLayout VLRegister = new VerticalLayout();
-    HorizontalLayout HL = new HorizontalLayout();
-    HorizontalLayout HLRegister = new HorizontalLayout();
-    @Autowired
-    MongoDBOperations database;
+@Route("login")
 
-    public LoginPage() {
-        //creating input field components
-        EmailField registerEmailField = new EmailField("Email");
-        registerEmailField.setClearButtonVisible(true);
-        registerEmailField.setErrorMessage("Please enter a valid email address");
+public class LoginPage extends VerticalLayout implements BeforeEnterObserver {
 
-        PasswordField registerPasswordField = new PasswordField();
-        registerPasswordField.setLabel("Password");
-        registerPasswordField.setPlaceholder("Enter password");
+    private LoginForm login =  new LoginForm();
 
-        EmailField loginEmailField = new EmailField("Email");
-        loginEmailField.setClearButtonVisible(true);
-        loginEmailField.setErrorMessage("Please enter a valid email address");
+    public LoginPage(){
+        addClassName("login-view");
+        setSizeFull();
+        setAlignItems(Alignment.CENTER);
+        setJustifyContentMode(JustifyContentMode.CENTER);
 
-        PasswordField loginPasswordField = new PasswordField();
-        loginPasswordField.setLabel("Password");
-        loginPasswordField.setPlaceholder("Enter password");
+        login.setAction("login");
 
-        //creating Register form Dialogue box to show when a new user is registering
-        Button confirmRegistrationButton = new Button("Confirm Registration");
-
-        FormLayout registerFormLayout = new FormLayout();
-
-        //registerFormLayout.addFormItem(registerEmailField, "");
-        //registerFormLayout.addFormItem(registerPasswordField, "");
-        HLRegister.add(registerEmailField, registerPasswordField);
-        HLRegister.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        VLRegister.add(confirmRegistrationButton);
-        VLRegister.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
-        //Dialog registerForm = new Dialog(registerEmailField, registerPasswordField);
-        //Dialog registerForm = new Dialog(registerFormLayout, confirmRegistrationButton);
-        Dialog registerForm = new Dialog(HLRegister, VLRegister);
-        registerForm.setCloseOnEsc(true);
-        registerForm.setCloseOnOutsideClick(true);
-        registerForm.setSizeFull();
-
-        confirmRegistrationButton.addClickListener(var -> {
-            if(registerPasswordField.getValue() != null && database.userEmailExists(registerEmailField.getValue())) {
-                database.insertUser(registerEmailField.getValue(), registerPasswordField.getValue());
-                registerForm.close();
-                VL.add(new Label("User registered successfully!"));
-            }
-        });
-
-        //creating and handling buttons
-        Button loginButton = new Button("Login");
-        Button registerButton = new Button("Register");
-        loginButton.addClickListener(var -> {
-            if(database.userExists(loginEmailField.getValue(), loginPasswordField.getValue())) {
-                TemporarySessionHandler.bindUserToSession(loginEmailField.getValue());
-                loginButton.getUI().ifPresent(ui ->
-                        ui.navigate("group"));
-            }
-            else {
-                VL.add(new Label("Error: USER NOT FOUND"));
-            }
-        });
-        registerButton.addClickListener(var -> {
-            registerForm.open();
-        });
-
-
-        //displaying components on web page
-        VL.add(loginEmailField, loginPasswordField, loginButton, registerButton);
-        VL.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
-        add(VL, HL);
+        add(new H1("Fit Together"), login);
     }
 
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        // inform the user about an authentication error
+        if(beforeEnterEvent.getLocation()
+                .getQueryParameters()
+                .getParameters()
+                .containsKey("error")) {
+            login.setError(true);
+        }
+    }
 }

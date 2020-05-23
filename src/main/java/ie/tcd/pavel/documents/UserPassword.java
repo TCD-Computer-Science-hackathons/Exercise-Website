@@ -1,36 +1,76 @@
 package ie.tcd.pavel.documents;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import ie.tcd.pavel.security.Role;
 
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 
 @Document(collection = "userpasswords")
-public class UserPassword {
+public class UserPassword implements UserDetails {
     @Id
-    private String id;
+    private ObjectId id;
+    @Indexed(unique = true)
     private String login;
+    private List<Role> authorities;
     private String password;
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+    private boolean enabled;
 
-    public UserPassword(String login, String password)
+    public UserPassword(String login, List<Role> authorities, String password, boolean accountNonExpired,
+                        boolean accountNonLocked,boolean credentialsNonExpired, boolean enabled)
     {
         this.login = login;
-        this.password = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
+        this.authorities = authorities;
+        this.password = password;
+        this.accountNonExpired = accountNonExpired;
+        this.accountNonLocked = accountNonLocked;
+        this.credentialsNonExpired = credentialsNonExpired;
+        this.enabled = enabled;
     }
 
-    public String getLogin() {
-        return login;
+
+    @Override
+    public Collection<Role> getAuthorities() {
+        return authorities;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
+    @Override
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
+    @Override
+    public String getUsername() {
+        return login;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return accountNonExpired;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 }
