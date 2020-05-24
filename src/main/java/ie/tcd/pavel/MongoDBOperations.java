@@ -191,6 +191,15 @@ public class MongoDBOperations {
         mongoTemplate.insert(new GroupPassword(name,encoder.encode(password)));
     }
 
+    public Group findGroup(String user, String group)
+    {
+        Query searchGroup = new Query(Criteria.where("user").is(user).and("name").is(group));
+        Group groupResult = mongoTemplate.findOne(searchGroup,Group.class);
+        return groupResult;
+
+    }
+
+
     public boolean groupExists(String name, String password)
     {
         Query searchGroupPassword = new Query(Criteria.where("name").is(name));
@@ -238,10 +247,10 @@ public class MongoDBOperations {
 
 
     //returns total time in minutes or total distance in km or total reps or total weight in kg
-    public HashMap<User,Double> inGroupGetCumulativeValuesByUserAndType(String group, String type)
+    public HashMap<String,Double> inGroupGetCumulativeValuesByUserAndType(String group, String type)
     {
         HashMap<User, List<Exercise>> allUsersExercises = inGroupGetExercisesByUsersAndType(group,type);
-        HashMap<User,Double> cumulativeData = new HashMap<User,Double>();
+        HashMap<String,Double> cumulativeData = new HashMap<String,Double>();
         if(exerciseTypes.getDistanceExercises().contains(type))
         {
             for(User user:allUsersExercises.keySet())
@@ -250,10 +259,9 @@ public class MongoDBOperations {
                 List<Exercise> exercises = allUsersExercises.get(user);
                 for(Exercise exercise: exercises)
                 {
-                    System.out.println(ExerciseAdaptor.getDistanceValue(exercise.getInformation()));
                     currentValue+= ExerciseAdaptor.getDistanceValue(exercise.getInformation());
                 }
-                cumulativeData.put(user,currentValue);
+                cumulativeData.put(user.getLogin(),currentValue);
             }
         }
         else if(exerciseTypes.getRepExercises().contains(type))
@@ -266,7 +274,7 @@ public class MongoDBOperations {
                 {
                     currentValue+= ExerciseAdaptor.getRepsValue(exercise.getInformation());
                 }
-                cumulativeData.put(user,currentValue);
+                cumulativeData.put(user.getLogin(),currentValue);
             }
         }
         else if(exerciseTypes.getWeightExercises().contains(type))
@@ -279,7 +287,7 @@ public class MongoDBOperations {
                 {
                     currentValue+= ExerciseAdaptor.getWeightValue(exercise.getInformation());
                 }
-                cumulativeData.put(user,currentValue);
+                cumulativeData.put(user.getLogin(),currentValue);
             }
         }
         else if(exerciseTypes.getTimeExercises().contains(type))
@@ -292,28 +300,30 @@ public class MongoDBOperations {
                 {
                     currentValue+= ExerciseAdaptor.getTimeValue(exercise.getInformation());
                 }
-                cumulativeData.put(user,currentValue);
+                cumulativeData.put(user.getLogin(),currentValue);
             }
         }
 
         return  cumulativeData;
     }
 
+    public void makeAdmin(String user, String group)
+    {
+        mongoTemplate.insert(new GroupAdmin(user,group));
+    }
 
+    public boolean checkIfAdmin(String user, String group)
+    {
+        Query checkAdmin = new Query(Criteria.where("admin").is(user).and("groupName").is(group));
+        List<GroupAdmin> admins = mongoTemplate.query(GroupAdmin.class).matching(checkAdmin).all();
+        return admins.size()>0;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public void removeUserFromGroup(String user, String group)
+    {
+        Group groupToRemove = this.findGroup(user,group);
+        mongoTemplate.remove(groupToRemove);
+    }
 
 
 

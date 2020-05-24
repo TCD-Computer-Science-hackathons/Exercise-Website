@@ -33,7 +33,6 @@ import ie.tcd.pavel.utility.ExerciseTypes;
 
 import javax.management.Notification;
 
-@Route("charts")
 public class ExerciseChartsPage extends VerticalLayout {
 
 	ExerciseTypes exerciseTypes;
@@ -65,11 +64,10 @@ public class ExerciseChartsPage extends VerticalLayout {
         	comboBoxExercise.setLabel("Exercise");
         	comboBoxExercise.setItems(exercises);
         	comboBoxExercise.addValueChangeListener(exerciseEvent ->{
-				HashMap<User, Double> data= database.inGroupGetCumulativeValuesByUserAndType(comboBoxGroup.getValue(),
+				verticalLayout.remove(comboBoxExercise);
+				HashMap<String, Double> data= database.inGroupGetCumulativeValuesByUserAndType(comboBoxGroup.getValue(),
 						comboBoxExercise.getValue());
-
-
-        		Chart pieChart= new Chart(ChartType.PIE);
+        		Chart pieChart = new Chart(ChartType.PIE);
         		horizontalLayout.remove(pieChart);
         		Configuration pieChartConfig= pieChart.getConfiguration();
         		pieChartConfig.setTitle("Member Contribution");
@@ -85,11 +83,12 @@ public class ExerciseChartsPage extends VerticalLayout {
                 plotOptions.setShowInLegend(true);
                 pieChartConfig.setPlotOptions(plotOptions);
                 
-                DataSeries dataSeries= new DataSeries();
-                for(int i= 0; i<database.getUsersByGroup(comboBoxGroup.getValue()).size(); i++)
+                DataSeries dataSeries = new DataSeries();
+                ArrayList<User> usersList = (ArrayList<User>) database.getUsersByGroup(comboBoxGroup.getValue());
+                for(int i= 0; i<usersList.size(); i++)
 				{
-                	User user= database.getUsersByGroup(comboBoxGroup.getValue()).get(i);
-                	dataSeries.add(new DataSeriesItem(user.getLogin(), data.get(user)));
+                	User user= usersList.get(i);
+                	dataSeries.add(new DataSeriesItem(user.getLogin(), data.get(user.getLogin())));
                 }
                 pieChartConfig.setSeries(dataSeries);
                 pieChart.setVisibilityTogglingDisabled(true);
@@ -101,4 +100,7 @@ public class ExerciseChartsPage extends VerticalLayout {
     	horizontalLayout.add(verticalLayout);
     	add(verticalLayout, horizontalLayout);
     }
+
+
+
 }
