@@ -25,16 +25,21 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
 import ie.tcd.pavel.security.SecurityUtils;
 import org.apache.catalina.webresources.FileResource;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 
 
 @CssImport(value = "./styles/shared-styles.css")
 @Route("")
 public class MainPage extends AppLayout implements BeforeEnterObserver {
+
+    private HashMap<Tab, Component> tabMap = new HashMap<>();
+    private Image background = new Image("https://i.imgur.com/2ikSvg1.jpg", "Background");
+
     public MainPage() {
-        setPrimarySection(AppLayout.Section.DRAWER);
-        Image background = new Image("https://i.imgur.com/2ikSvg1.jpg", "Background");
         this.setContent(background);
+        setPrimarySection(AppLayout.Section.DRAWER);
     }
 
     @Override
@@ -44,41 +49,68 @@ public class MainPage extends AppLayout implements BeforeEnterObserver {
         if(SecurityUtils.isUserLoggedIn())
         {
             createHeaderWithLogout();
-            tabs = new Tabs(createHomeTab(),createTab("Add Exercise",AddExercisePage.class),
-                    createTab("Create/Join Group",JoinCreateGroupPage.class),
-                    createTab("Charts",ExerciseChartsPage.class));
+            tabs = new Tabs(
+                    createHomeTab(),
+                    createTab("Add Exercise", AddExercisePage.class),
+                    createTab("Create/Join Group", JoinCreateGroupPage.class),
+                    createTab("Charts", ExerciseChartsPage.class),
+                    createMyGroupsTab()
+            );
+            tabs.addSelectedChangeListener(event -> {
+                final Tab selectedTab = event.getSelectedTab();
+                if(tabMap.containsKey(selectedTab)) {
+                    setContent(tabMap.get(selectedTab));
+                }
+            });
 
         }
         else
         {
             createHeaderWithoutLogout();
-             tabs = new Tabs(createHomeTab(),createTab("Register",RegisterPage.class),
-                    createTab("Login",LoginPage.class));
+            tabs = new Tabs(
+                    createHomeTab(),
+                    createTab("Register",RegisterPage.class),
+                    createTab("Login",LoginPage.class)
+            );
+            tabs.addSelectedChangeListener(event -> {
+                final Tab selectedTab = event.getSelectedTab();
+                if(tabMap.containsKey(selectedTab)) {
+                    setContent(tabMap.get(selectedTab));
+                }
+            });
         }
 
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
         addToDrawer(tabs);
     }
 
-
-    private static Tab createHomeTab()
+    private Tab createHomeTab()
     {
         Tab home = new Tab("Home");
+        tabMap.put(home, background);
         return  home;
     }
 
-    private static Tab createTab( String title, Class<? extends Component> viewClass) {
+    private Tab createMyGroupsTab()
+    {
+        Tab myGroups = new Tab("My Groups");
+        myGroups.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
+        tabMap.put(myGroups, new MyGroupsPage());
+        return myGroups;
+    }
+
+    private Tab createTab( String title, Class<? extends Component> viewClass) {
         return createTab(populateLink(new RouterLink(null, viewClass),title));
     }
 
-    private static Tab createTab(Component content) {
+    private Tab createTab(Component content) {
         final Tab tab = new Tab();
         tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
         tab.add(content);
         return tab;
     }
 
-    private static <T extends HasComponents> T populateLink(T a,  String title) {
+    private <T extends HasComponents> T populateLink(T a,  String title) {
         a.add(title);
         return a;
     }

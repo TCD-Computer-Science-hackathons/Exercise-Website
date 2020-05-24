@@ -22,7 +22,6 @@ public class RegisterPage extends VerticalLayout {
 
         database = BeanUtil.getBean(MongoDBOperations.class);
 
-
         TextField registerNameField = new TextField("Username");
         registerNameField.setClearButtonVisible(true);
         registerNameField.setErrorMessage("Please enter a valid email address");
