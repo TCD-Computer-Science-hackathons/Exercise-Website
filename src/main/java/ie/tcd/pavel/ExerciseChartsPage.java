@@ -27,6 +27,7 @@ import com.vaadin.flow.router.Route;
 
 import ie.tcd.pavel.documents.Group;
 import ie.tcd.pavel.documents.User;
+import ie.tcd.pavel.security.SecurityUtils;
 import ie.tcd.pavel.utility.ExerciseTypes;
 
 @Route("charts")
@@ -41,8 +42,8 @@ public class ExerciseChartsPage extends VerticalLayout {
     	database = BeanUtil.getBean(MongoDBOperations.class);
         exerciseTypes = BeanUtil.getBean(ExerciseTypes.class);
         String[] exercises = exerciseTypes.getExerciseTypes();  
-    	List<Group> groups= database.getGroupsByUser(TemporarySessionHandler.getCurrentUser());
-    	User currentUser= database.getUserByLogin(TemporarySessionHandler.getCurrentUser());
+    	List<Group> groups= database.getGroupsByUser(SecurityUtils.getUsername());
+    	User currentUser= database.getUserByLogin(SecurityUtils.getUsername());
     	String currentUserString= currentUser.getForename()+ " "+ currentUser.getSurname();
     	Group currentGroup= groups.get(0);
     	List<User> users= database.getUsersByGroup(currentGroup.getName());  	

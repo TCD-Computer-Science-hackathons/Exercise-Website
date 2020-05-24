@@ -7,6 +7,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import ie.tcd.pavel.security.SecurityUtils;
 import ie.tcd.pavel.utility.ExerciseAdaptor;
 import ie.tcd.pavel.utility.ExerciseTypes;
 
@@ -95,41 +96,41 @@ public class AddExerciseButton extends Button {
             if(data != null) {
                 if(exerciseFields.get(exercise.getValue()) instanceof DistanceField) {
                     DistanceField distanceField = (DistanceField) getCustomField(exercise.getValue());
-                    database.insertExercise(TemporarySessionHandler.getCurrentUser(),
+                    database.insertExercise(SecurityUtils.getUsername(),
                         exercise.getValue(),
                         ExerciseAdaptor.getDistanceFieldInfo(distanceField.getDistance(), distanceField.getUnit()),
                         new Date().getTime());
                     System.out.printf("%s: Added %s%s at %s to %s%n", exercise.getValue(), distanceField.getDistance(),
-                            distanceField.getUnit(), new Date().getTime(), TemporarySessionHandler.getCurrentUser());
+                            distanceField.getUnit(), new Date().getTime(), SecurityUtils.getUsername());
 
                 } else if(exerciseFields.get(exercise.getValue()) instanceof RepField) {
                     RepField repField = (RepField) getCustomField(exercise.getValue());
-                    database.insertExercise(TemporarySessionHandler.getCurrentUser(),
+                    database.insertExercise(SecurityUtils.getUsername(),
                         exercise.getValue(),
                         ExerciseAdaptor.getRepFieldInfo(repField.getReps()),
                         new Date().getTime());
                     System.out.printf("%s: Added %s reps at %s to %s%n", exercise.getValue(), repField.getReps(),
-                            new Date().getTime(), TemporarySessionHandler.getCurrentUser());
+                            new Date().getTime(), SecurityUtils.getUsername());
 
                 } else if(exerciseFields.get(exercise.getValue()) instanceof TimeField) {
                     TimeField timeField = (TimeField) getCustomField(exercise.getValue());
-                    database.insertExercise(TemporarySessionHandler.getCurrentUser(),
+                    database.insertExercise(SecurityUtils.getUsername(),
                             exercise.getValue(),
                             ExerciseAdaptor.getTimeFieldInfo(timeField.getTime(), timeField.getUnit()),
                             new Date().getTime());
                     System.out.printf("%s: Added %s%s at %s to %s%n", exercise.getValue(), timeField.getTime(),
-                            timeField.getUnit(), new Date().getTime(), TemporarySessionHandler.getCurrentUser());
+                            timeField.getUnit(), new Date().getTime(), SecurityUtils.getUsername());
 
                 } else if(exerciseFields.get(exercise.getValue()) instanceof WeightField) {
                     WeightField weightField = (WeightField) getCustomField(exercise.getValue());
-                    database.insertExercise(TemporarySessionHandler.getCurrentUser(),
+                    database.insertExercise(SecurityUtils.getUsername(),
                             exercise.getValue(),
                             ExerciseAdaptor.getWeightFieldInfo(weightField.getWeight(), weightField.getUnit(),
                                     weightField.getReps()),
                             new Date().getTime());
                     System.out.printf("%s: Added %s%s for %s reps at %s to %s%n", exercise.getValue(),
                             weightField.getWeight(), weightField.getUnit(), weightField.getReps(),
-                                new Date().getTime(), TemporarySessionHandler.getCurrentUser());
+                                new Date().getTime(), SecurityUtils.getUsername());
                 }
                 dialog.close();
             }

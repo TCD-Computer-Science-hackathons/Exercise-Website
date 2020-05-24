@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
+import ie.tcd.pavel.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -71,7 +72,8 @@ public class JoinCreateGroupPage extends VerticalLayout {
 			// User is creating a new group
 			if(!newGroupNameField.getValue().equals("") && !newGroupPassField.getValue().equals("")) {
 				if(!database.groupExists(newGroupNameField.getValue())) {
-					database.insertGroup(newGroupNameField.getValue(), newGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
+					database.insertGroup(newGroupNameField.getValue(), newGroupPassField.getValue(),
+							SecurityUtils.getUsername());
 					dialog1.close();
 					debugLabel.setText("Group Created Successfully");
 					System.out.printf("[DEBUG] Group Created: Name - %s | Password - %s%n", newGroupNameField.getValue(), newGroupPassField.getValue());
@@ -92,7 +94,8 @@ public class JoinCreateGroupPage extends VerticalLayout {
 			// User is attempting to join a group
 			if(!joinGroupNameField.getValue().equals("") && !joinGroupPassField.getValue().equals("")) {
 				if (database.groupExists(joinGroupNameField.getValue(), joinGroupPassField.getValue())) {
-					database.insertGroup(joinGroupNameField.getValue(), joinGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
+					database.insertGroup(joinGroupNameField.getValue(), joinGroupPassField.getValue(),
+							SecurityUtils.getUsername());
 					dialog2.close();
 					debugLabel.setText("Group Joined Successfully");
 					System.out.printf("[DEBUG] Group Joined: Name - %s | Password - %s%n", joinGroupNameField.getValue(), joinGroupPassField.getValue());

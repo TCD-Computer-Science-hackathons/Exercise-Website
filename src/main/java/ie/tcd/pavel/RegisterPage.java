@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -37,7 +38,7 @@ public class RegisterPage extends VerticalLayout {
         registerPasswordField.setPlaceholder("Enter password");
 
 
-        Button registerButton = new Button("Login");;
+        Button registerButton = new Button("Register");;
         registerButton.addClickListener(var -> {
             if(!database.userEmailExists(registerEmailField.getValue())) {
                 database.insertUser(registerEmailField.getValue(),registerPasswordField.getValue());
@@ -48,8 +49,8 @@ public class RegisterPage extends VerticalLayout {
                 errorLabel.setText("Error: LOGIN NOT AVAILABLE");
             }
         });
-
-        //displaying components on web page
+        H1 logo = new H1("Fit Together");
+        VL.add(logo);
         VL.add(registerEmailField, registerPasswordField, registerButton, registerButton, errorLabel);
         VL.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         add(VL, HL);
