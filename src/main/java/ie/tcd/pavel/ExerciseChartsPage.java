@@ -33,7 +33,6 @@ import ie.tcd.pavel.utility.ExerciseTypes;
 
 import javax.management.Notification;
 
-@Route("charts")
 public class ExerciseChartsPage extends VerticalLayout {
 
 	ExerciseTypes exerciseTypes;
@@ -101,4 +100,7 @@ public class ExerciseChartsPage extends VerticalLayout {
     	horizontalLayout.add(verticalLayout);
     	add(verticalLayout, horizontalLayout);
     }
+
+
+
 }

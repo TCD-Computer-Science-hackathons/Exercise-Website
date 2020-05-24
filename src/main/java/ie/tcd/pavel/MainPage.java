@@ -53,7 +53,7 @@ public class MainPage extends AppLayout implements BeforeEnterObserver {
                     createHomeTab(),
                     createTab("Add Exercise", AddExercisePage.class),
                     createTab("Create/Join Group", JoinCreateGroupPage.class),
-                    createTab("Charts", ExerciseChartsPage.class),
+                    createChartsTab(),
                     createMyGroupsTab()
             );
             tabs.addSelectedChangeListener(event -> {
@@ -97,6 +97,14 @@ public class MainPage extends AppLayout implements BeforeEnterObserver {
         myGroups.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
         tabMap.put(myGroups, new MyGroupsPage());
         return myGroups;
+    }
+
+    private Tab createChartsTab()
+    {
+        Tab myCharts= new Tab("My Charts");
+        myCharts.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
+        tabMap.put(myCharts, new ExerciseChartsPage());
+        return myCharts;
     }
 
     private Tab createTab( String title, Class<? extends Component> viewClass) {
