@@ -42,7 +42,7 @@ public class RegisterPage extends VerticalLayout {
             if(!database.userEmailExists(registerEmailField.getValue())) {
                 database.insertUser(registerEmailField.getValue(),registerPasswordField.getValue());
                 registerButton.getUI().ifPresent(ui ->
-                        ui.navigate("group"));
+                        ui.navigate("login"));
             }
             else {
                 errorLabel.setText("Error: LOGIN NOT AVAILABLE");
