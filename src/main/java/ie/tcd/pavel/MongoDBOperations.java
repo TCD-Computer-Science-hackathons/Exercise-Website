@@ -238,10 +238,10 @@ public class MongoDBOperations {
 
 
     //returns total time in minutes or total distance in km or total reps or total weight in kg
-    public HashMap<User,Double> inGroupGetCumulativeValuesByUserAndType(String group, String type)
+    public HashMap<String,Double> inGroupGetCumulativeValuesByUserAndType(String group, String type)
     {
         HashMap<User, List<Exercise>> allUsersExercises = inGroupGetExercisesByUsersAndType(group,type);
-        HashMap<User,Double> cumulativeData = new HashMap<User,Double>();
+        HashMap<String,Double> cumulativeData = new HashMap<String,Double>();
         if(exerciseTypes.getDistanceExercises().contains(type))
         {
             for(User user:allUsersExercises.keySet())
@@ -250,10 +250,9 @@ public class MongoDBOperations {
                 List<Exercise> exercises = allUsersExercises.get(user);
                 for(Exercise exercise: exercises)
                 {
-                    System.out.println(ExerciseAdaptor.getDistanceValue(exercise.getInformation()));
                     currentValue+= ExerciseAdaptor.getDistanceValue(exercise.getInformation());
                 }
-                cumulativeData.put(user,currentValue);
+                cumulativeData.put(user.getLogin(),currentValue);
             }
         }
         else if(exerciseTypes.getRepExercises().contains(type))
@@ -266,7 +265,7 @@ public class MongoDBOperations {
                 {
                     currentValue+= ExerciseAdaptor.getRepsValue(exercise.getInformation());
                 }
-                cumulativeData.put(user,currentValue);
+                cumulativeData.put(user.getLogin(),currentValue);
             }
         }
         else if(exerciseTypes.getWeightExercises().contains(type))
@@ -279,7 +278,7 @@ public class MongoDBOperations {
                 {
                     currentValue+= ExerciseAdaptor.getWeightValue(exercise.getInformation());
                 }
-                cumulativeData.put(user,currentValue);
+                cumulativeData.put(user.getLogin(),currentValue);
             }
         }
         else if(exerciseTypes.getTimeExercises().contains(type))
@@ -292,7 +291,7 @@ public class MongoDBOperations {
                 {
                     currentValue+= ExerciseAdaptor.getTimeValue(exercise.getInformation());
                 }
-                cumulativeData.put(user,currentValue);
+                cumulativeData.put(user.getLogin(),currentValue);
             }
         }
 
