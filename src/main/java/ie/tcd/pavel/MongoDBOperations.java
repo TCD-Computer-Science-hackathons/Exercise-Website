@@ -188,7 +188,9 @@ public class MongoDBOperations {
     public void insertGroup(String name, String password, String user)
     {
         mongoTemplate.insert(new Group(name,user));
-        mongoTemplate.insert(new GroupPassword(name,encoder.encode(password)));
+        if(getUsersByGroup(name).size() < 2) {
+            mongoTemplate.insert(new GroupPassword(name,encoder.encode(password)));
+        }
     }
 
     public Group findGroup(String user, String group)
