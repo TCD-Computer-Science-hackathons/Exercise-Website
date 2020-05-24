@@ -74,6 +74,7 @@ public class JoinCreateGroupPage extends VerticalLayout {
 				if(!database.groupExists(newGroupNameField.getValue())) {
 					database.insertGroup(newGroupNameField.getValue(), newGroupPassField.getValue(),
 							SecurityUtils.getUsername());
+					database.makeAdmin(SecurityUtils.getUsername(), newGroupNameField.getValue());
 					dialog1.close();
 					debugLabel.setText("Group Created Successfully");
 					System.out.printf("[DEBUG] Group Created: Name - %s | Password - %s%n", newGroupNameField.getValue(), newGroupPassField.getValue());
