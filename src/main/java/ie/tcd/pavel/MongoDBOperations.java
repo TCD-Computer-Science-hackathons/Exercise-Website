@@ -43,7 +43,7 @@ public class MongoDBOperations {
 
     }
 
-    public boolean userEmailExists(String login) {
+    public boolean userNameExists(String login) {
         Query searchUser = new Query(Criteria.where("login").is(login));
         List<User> resultUsers = mongoTemplate.query(User.class).matching(searchUser).all();
         return resultUsers.size()>0;

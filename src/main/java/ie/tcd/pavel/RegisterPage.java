@@ -1,19 +1,13 @@
 package ie.tcd.pavel;
 
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
 @Route("register")
@@ -29,9 +23,9 @@ public class RegisterPage extends VerticalLayout {
         database = BeanUtil.getBean(MongoDBOperations.class);
 
 
-        EmailField registerEmailField = new EmailField("Email");
-        registerEmailField.setClearButtonVisible(true);
-        registerEmailField.setErrorMessage("Please enter a valid email address");
+        TextField registerNameField = new TextField("Username");
+        registerNameField.setClearButtonVisible(true);
+        registerNameField.setErrorMessage("Please enter a valid email address");
 
         PasswordField registerPasswordField = new PasswordField();
         registerPasswordField.setLabel("Password");
@@ -40,18 +34,18 @@ public class RegisterPage extends VerticalLayout {
 
         Button registerButton = new Button("Register");;
         registerButton.addClickListener(var -> {
-            if(!database.userEmailExists(registerEmailField.getValue())) {
-                database.insertUser(registerEmailField.getValue(),registerPasswordField.getValue());
+            if(!database.userNameExists(registerNameField.getValue())) {
+                database.insertUser(registerNameField.getValue(),registerPasswordField.getValue());
                 registerButton.getUI().ifPresent(ui ->
                         ui.navigate("login"));
             }
             else {
-                errorLabel.setText("Error: LOGIN NOT AVAILABLE");
+                errorLabel.setText("Error: Email already taken");
             }
         });
         H1 logo = new H1("Fit Together");
         VL.add(logo);
-        VL.add(registerEmailField, registerPasswordField, registerButton, registerButton, errorLabel);
+        VL.add(registerNameField, registerPasswordField, registerButton, registerButton, errorLabel);
         VL.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         add(VL, HL);
     }
