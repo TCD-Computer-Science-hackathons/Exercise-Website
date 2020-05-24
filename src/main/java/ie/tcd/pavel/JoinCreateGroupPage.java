@@ -69,7 +69,7 @@ public class JoinCreateGroupPage extends VerticalLayout {
 
 		confirmCreateGroup.addClickListener( event1 -> {
 			// User is creating a new group
-			if(newGroupNameField.getValue() != null || newGroupPassField.getValue() != null) {
+			if(!newGroupNameField.getValue().equals("") && !newGroupPassField.getValue().equals("")) {
 				if(!database.groupExists(newGroupNameField.getValue())) {
 					database.insertGroup(newGroupNameField.getValue(), newGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
 					dialog1.close();
@@ -90,7 +90,7 @@ public class JoinCreateGroupPage extends VerticalLayout {
 
 		confirmJoinGroup.addClickListener( event1 -> {
 			// User is attempting to join a group
-			if(joinGroupNameField.getValue() != null || joinGroupPassField.getValue() != null) {
+			if(!joinGroupNameField.getValue().equals("") && !joinGroupPassField.getValue().equals("")) {
 				if (database.groupExists(joinGroupNameField.getValue(), joinGroupPassField.getValue())) {
 					database.insertGroup(joinGroupNameField.getValue(), joinGroupPassField.getValue(), TemporarySessionHandler.getCurrentUser());
 					dialog2.close();
@@ -100,7 +100,7 @@ public class JoinCreateGroupPage extends VerticalLayout {
 					verLay2.remove(joinErrorLabel);
 					joinErrorLabel.setText("Invalid Group Name/Password");
 					verLay2.add(joinErrorLabel);
-					System.out.printf("[DEBUG] Someone tried to join a group that does not exist%n");
+					System.out.printf("[DEBUG] Someone tried to join a group that does not exist. Password Incorrect.%n");
 				}
 			} else {
 				verLay2.remove(joinErrorLabel);

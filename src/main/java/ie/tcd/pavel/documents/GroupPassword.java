@@ -13,7 +13,7 @@ public class GroupPassword {
     public GroupPassword(String name, String password)
     {
         this.name = name;
-        this.password = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
+        this.password = password;
     }
 
     public String getPassword() {
@@ -21,7 +21,7 @@ public class GroupPassword {
     }
 
     public void setPassword(String password) {
-        this.password = org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
+        this.password = this.password;
     }
 
     public String getName() {

@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -24,11 +25,13 @@ public class MongoDBOperations {
     MongoTemplate mongoTemplate;
     @Autowired
     ExerciseTypes exerciseTypes;
+    @Autowired
+    BCryptPasswordEncoder encoder;
 
     public void insertUser(String login, String password) {
         mongoTemplate.insert(new User(login));
         mongoTemplate.insert(new UserPassword(login, ImmutableList.of(Role.USER),
-                new BCryptPasswordEncoder().encode(password),true,true,true,
+                encoder.encode(password),true,true,true,
                 true));
     }
 
@@ -48,10 +51,9 @@ public class MongoDBOperations {
 
     public boolean userExists(String login, String password)
     {
-        Query searchUserPassword = new Query(Criteria.where("login").is(login).and("password").
-                is( new BCryptPasswordEncoder().encode(password)));
+        Query searchUserPassword = new Query(Criteria.where("login").is(login));
         List<UserPassword> resultUsers = mongoTemplate.query(UserPassword.class).matching(searchUserPassword).all();
-        return resultUsers.size() > 0;
+        return encoder.matches(password,resultUsers.get(0).getPassword());
     }
 
     public Optional<UserPassword> getUserPasswordByLogin(String login)
@@ -186,15 +188,15 @@ public class MongoDBOperations {
     public void insertGroup(String name, String password, String user)
     {
         mongoTemplate.insert(new Group(name,user));
-        mongoTemplate.insert(new GroupPassword(name,new BCryptPasswordEncoder().encode(password)));
+        mongoTemplate.insert(new GroupPassword(name,encoder.encode(password)));
     }
 
     public boolean groupExists(String name, String password)
     {
-        Query searchGroupPassword = new Query(Criteria.where("name").is(name).and("password").
-                is(new BCryptPasswordEncoder().encode(password)));
+        Query searchGroupPassword = new Query(Criteria.where("name").is(name));
         List<GroupPassword> resultGroups = mongoTemplate.query(GroupPassword.class).matching(searchGroupPassword).all();
-        return resultGroups.size() > 0;
+        System.out.println(resultGroups.get(0).getPassword());
+        return encoder.matches(password,resultGroups.get(0).getPassword());
     }
 
     public boolean groupExists(String name)

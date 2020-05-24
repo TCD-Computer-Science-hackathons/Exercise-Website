@@ -19,7 +19,7 @@ public class LoginPage extends VerticalLayout implements BeforeEnterObserver {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
-
+        login.setForgotPasswordButtonVisible(false);
         login.setAction("login");
 
         add(new H1("Fit Together"), login);
