@@ -35,8 +35,11 @@ import java.util.HashMap;
 public class MainPage extends AppLayout implements BeforeEnterObserver {
 
     private HashMap<Tab, Component> tabMap = new HashMap<>();
-    private Image background = new Image("https://i.imgur.com/4AhkxVz.jpg", "Background");
+
     MongoDBOperations database;
+    private Image background = new Image("https://i.imgur.com/rrlI3vE.jpg", "Background");
+
+
     public MainPage() {
         database = BeanUtil.getBean(MongoDBOperations.class);
         this.setContent(background);
@@ -230,6 +233,7 @@ public class MainPage extends AppLayout implements BeforeEnterObserver {
                 if(!database.groupExists(newGroupNameField.getValue())) {
                     database.insertGroup(newGroupNameField.getValue(), newGroupPassField.getValue(),
                             SecurityUtils.getUsername());
+                    database.makeAdmin(SecurityUtils.getUsername(), newGroupNameField.getValue());
                     dialog.close();
                     System.out.printf("[DEBUG] Group Created: Name - %s | Password - %s%n", newGroupNameField.getValue(), newGroupPassField.getValue());
                 } else {

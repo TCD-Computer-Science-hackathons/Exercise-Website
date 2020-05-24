@@ -188,7 +188,9 @@ public class MongoDBOperations {
     public void insertGroup(String name, String password, String user)
     {
         mongoTemplate.insert(new Group(name,user));
-        mongoTemplate.insert(new GroupPassword(name,encoder.encode(password)));
+        if(getUsersByGroup(name).size() < 2) {
+            mongoTemplate.insert(new GroupPassword(name,encoder.encode(password)));
+        }
     }
 
 
@@ -329,5 +331,18 @@ public class MongoDBOperations {
     {
         Group groupToRemove = this.findGroup(user,group);
         mongoTemplate.remove(groupToRemove);
+    }
+
+
+    public void deleteGroupFinal(String name)
+    {
+        Query findAdmins = new Query(Criteria.where("groupName").is(name));
+        List<GroupAdmin> admins = mongoTemplate.query(GroupAdmin.class).matching(findAdmins).all();
+        for(GroupAdmin admin : admins) {
+            mongoTemplate.remove(admin);
+        }
+        Query searchGroupPassword = new Query(Criteria.where("name").is(name));
+        GroupPassword password = mongoTemplate.findOne(searchGroupPassword,GroupPassword.class);
+        mongoTemplate.remove(password);
     }
 }
