@@ -191,6 +191,15 @@ public class MongoDBOperations {
         mongoTemplate.insert(new GroupPassword(name,encoder.encode(password)));
     }
 
+    public Group findGroup(String user, String group)
+    {
+        Query searchGroup = new Query(Criteria.where("user").is(user).and("name").is(group));
+        Group groupResult = mongoTemplate.findOne(searchGroup,Group.class);
+        return groupResult;
+
+    }
+
+
     public boolean groupExists(String name, String password)
     {
         Query searchGroupPassword = new Query(Criteria.where("name").is(name));
@@ -298,21 +307,23 @@ public class MongoDBOperations {
         return  cumulativeData;
     }
 
+    public void makeAdmin(String user, String group)
+    {
+        mongoTemplate.insert(new GroupAdmin(user,group));
+    }
 
+    public boolean checkIfAdmin(String user, String group)
+    {
+        Query checkAdmin = new Query(Criteria.where("admin").is(user).and("groupName").is(group));
+        List<GroupAdmin> admins = mongoTemplate.query(GroupAdmin.class).matching(checkAdmin).all();
+        return admins.size()>0;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public void removeUserFromGroup(String user, String group)
+    {
+        Group groupToRemove = this.findGroup(user,group);
+        mongoTemplate.remove(groupToRemove);
+    }
 
 
 
