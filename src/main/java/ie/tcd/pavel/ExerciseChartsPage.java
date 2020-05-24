@@ -31,6 +31,8 @@ import ie.tcd.pavel.documents.*;
 import ie.tcd.pavel.security.SecurityUtils;
 import ie.tcd.pavel.utility.ExerciseTypes;
 
+import javax.management.Notification;
+
 @Route("charts")
 public class ExerciseChartsPage extends VerticalLayout {
 
@@ -42,7 +44,7 @@ public class ExerciseChartsPage extends VerticalLayout {
     public ExerciseChartsPage() {
     	database = BeanUtil.getBean(MongoDBOperations.class);
         exerciseTypes = BeanUtil.getBean(ExerciseTypes.class);
-        
+
         String[] exercises = exerciseTypes.getExerciseTypes();  
     	List<Group> groups= database.getGroupsByUser(SecurityUtils.getUsername());
     	User currentUser= database.getUserByLogin(SecurityUtils.getUsername());
@@ -63,9 +65,12 @@ public class ExerciseChartsPage extends VerticalLayout {
         	comboBoxExercise.setLabel("Exercise");
         	comboBoxExercise.setItems(exercises);
         	comboBoxExercise.addValueChangeListener(exerciseEvent ->{
-				HashMap<User, Double> data= database.inGroupGetCumulativeValuesByUserAndType(comboBoxGroup.getValue(), comboBoxExercise.getValue());	
+				HashMap<User, Double> data= database.inGroupGetCumulativeValuesByUserAndType(comboBoxGroup.getValue(),
+						comboBoxExercise.getValue());
+
 
         		Chart pieChart= new Chart(ChartType.PIE);
+        		horizontalLayout.remove(pieChart);
         		Configuration pieChartConfig= pieChart.getConfiguration();
         		pieChartConfig.setTitle("Member Contribution");
         		pieChartConfig.setSubTitle(comboBoxExercise.getValue());
@@ -81,13 +86,8 @@ public class ExerciseChartsPage extends VerticalLayout {
                 pieChartConfig.setPlotOptions(plotOptions);
                 
                 DataSeries dataSeries= new DataSeries();
-                dataSeries.clear();
-                DataSeriesItem currentUserSeries= new DataSeriesItem(currentUser.getLogin(), data.get(currentUser));
-                currentUserSeries.setSliced(true);
-                currentUserSeries.setSelected(true);
-                dataSeries.add(currentUserSeries);
                 for(int i= 0; i<database.getUsersByGroup(comboBoxGroup.getValue()).size(); i++)
-                {
+				{
                 	User user= database.getUsersByGroup(comboBoxGroup.getValue()).get(i);
                 	dataSeries.add(new DataSeriesItem(user.getLogin(), data.get(user)));
                 }

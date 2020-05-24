@@ -220,7 +220,7 @@ public class MongoDBOperations {
         List<Group> resultGroup = mongoTemplate.query(Group.class).matching(searchGroup).all();
         List<User> users = new ArrayList<>();
         for (Group gr: resultGroup) {
-            users.add(getUserByLogin(gr.getName()));
+            users.add(getUserByLogin(gr.getUser()));
         }
         return users;
     }
@@ -250,6 +250,7 @@ public class MongoDBOperations {
                 List<Exercise> exercises = allUsersExercises.get(user);
                 for(Exercise exercise: exercises)
                 {
+                    System.out.println(ExerciseAdaptor.getDistanceValue(exercise.getInformation()));
                     currentValue+= ExerciseAdaptor.getDistanceValue(exercise.getInformation());
                 }
                 cumulativeData.put(user,currentValue);

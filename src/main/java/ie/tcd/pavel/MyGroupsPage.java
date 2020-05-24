@@ -35,7 +35,6 @@ public class MyGroupsPage extends VerticalLayout {
                 ArrayList<User> users = (ArrayList<User>) database.getUsersByGroup(g.getName());
                 if(!users.isEmpty()) {
                     for (User u : users) {
-                        System.out.printf(u.getLogin() + "%n");
                         group.addContent(new H3(u.getLogin()));
                     }
                 }
