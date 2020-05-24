@@ -191,6 +191,7 @@ public class MongoDBOperations {
         mongoTemplate.insert(new GroupPassword(name,encoder.encode(password)));
     }
 
+
     public Group findGroup(String user, String group)
     {
         Query searchGroup = new Query(Criteria.where("user").is(user).and("name").is(group));
@@ -204,8 +205,13 @@ public class MongoDBOperations {
     {
         Query searchGroupPassword = new Query(Criteria.where("name").is(name));
         List<GroupPassword> resultGroups = mongoTemplate.query(GroupPassword.class).matching(searchGroupPassword).all();
-        System.out.println(resultGroups.get(0).getPassword());
-        return encoder.matches(password,resultGroups.get(0).getPassword());
+        if(resultGroups.size()>0) {
+            return encoder.matches(password, resultGroups.get(0).getPassword());
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean groupExists(String name)
@@ -324,7 +330,4 @@ public class MongoDBOperations {
         Group groupToRemove = this.findGroup(user,group);
         mongoTemplate.remove(groupToRemove);
     }
-
-
-
 }
