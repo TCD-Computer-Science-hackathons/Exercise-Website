@@ -30,6 +30,8 @@ public class MyGroupsPage extends VerticalLayout {
         /**setHeightFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);**/
+        addClassName("mygroups");
+        setSizeFull();
         generateGroupDetails();
     }
 
