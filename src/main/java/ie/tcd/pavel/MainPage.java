@@ -35,7 +35,8 @@ import java.util.HashMap;
 public class MainPage extends AppLayout implements BeforeEnterObserver {
 
     private HashMap<Tab, Component> tabMap = new HashMap<>();
-    private Image background = new Image("https://i.imgur.com/4AhkxVz.jpg", "Background");
+    private Image background = new Image("https://i.imgur.com/Ua18y2v.jpg", "Background");
+
 
     public MainPage() {
         this.setContent(background);

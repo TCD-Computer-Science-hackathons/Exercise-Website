@@ -2,14 +2,18 @@ package ie.tcd.pavel;
 
 import com.mongodb.Mongo;
 import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.treegrid.TreeGrid;
 import ie.tcd.pavel.documents.Group;
 import ie.tcd.pavel.documents.User;
 import ie.tcd.pavel.security.SecurityUtils;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +35,19 @@ public class MyGroupsPage extends VerticalLayout {
         if(!groups.isEmpty()) {
             for (Group g : groups) {
                 Details group = new Details();
-                group.setSummary(new Label(g.getName()));
+                group.setSummaryText(g.getName());
+                Button leaveButton = new Button("Leave");
                 ArrayList<User> users = (ArrayList<User>) database.getUsersByGroup(g.getName());
                 if(!users.isEmpty()) {
                     for (User u : users) {
-                        group.addContent(new H3(u.getLogin()));
+                        // Only show this version if the user owns the group
+                        Details userSubDetails = new Details();
+                        Button button = new Button("Kick");
+                        userSubDetails.setSummaryText(u.getLogin());
+                        userSubDetails.addContent(button);
+                        Label padding = new Label();
+                        padding.getStyle().set("width", "1em");
+                        group.addContent(new HorizontalLayout(padding, userSubDetails), leaveButton);
                     }
                 }
                 groupDetails.add(group);
@@ -46,5 +58,6 @@ public class MyGroupsPage extends VerticalLayout {
         } else {
             add(new H3("You are not a member of any groups!"));
         }
+
     }
 }
