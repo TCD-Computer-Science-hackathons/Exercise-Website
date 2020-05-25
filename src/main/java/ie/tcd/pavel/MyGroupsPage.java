@@ -1,6 +1,7 @@
 package ie.tcd.pavel;
 
 import com.mongodb.Mongo;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
@@ -25,12 +26,8 @@ public class MyGroupsPage extends VerticalLayout {
 
     public MyGroupsPage()
     {
+        addClassName("centered-content");
         database = BeanUtil.getBean(MongoDBOperations.class);
-        // Centers the components
-        /**setHeightFull();
-        setAlignItems(Alignment.CENTER);
-        setJustifyContentMode(JustifyContentMode.CENTER);**/
-        addClassName("mygroups");
         setSizeFull();
         generateGroupDetails();
     }
@@ -55,6 +52,7 @@ public class MyGroupsPage extends VerticalLayout {
                     }
                     removeAll();
                     generateGroupDetails();
+                    UI.getCurrent().getPage().reload();
                 });
                 ArrayList<User> users = (ArrayList<User>) database.getUsersByGroup(g.getName());
                 if(!users.isEmpty()) {
@@ -75,6 +73,7 @@ public class MyGroupsPage extends VerticalLayout {
                                 kickButton.setDisableOnClick(true);
                                 kickButton.addClickListener(event -> {
                                     database.removeUserFromGroup(u.getLogin(), g.getName());
+                                    UI.getCurrent().getPage().reload();
                                 });
                                 userSubDetails.addContent(new HorizontalLayout(padding, kickButton));
                             }

@@ -37,13 +37,14 @@ public class ExerciseChartsPage extends VerticalLayout {
 
 	ExerciseTypes exerciseTypes;
     MongoDBOperations database;
-    VerticalLayout verticalLayout= new VerticalLayout();
     HorizontalLayout horizontalLayout= new HorizontalLayout();
-	
+	HorizontalLayout horizontalLayoutUIs = new HorizontalLayout();
     public ExerciseChartsPage() {
     	database = BeanUtil.getBean(MongoDBOperations.class);
         exerciseTypes = BeanUtil.getBean(ExerciseTypes.class);
-
+        horizontalLayout.setWidthFull();
+        horizontalLayout.setHeight("90%");
+		this.setSizeFull();
         String[] exercises = exerciseTypes.getExerciseTypes();  
     	List<Group> groups= database.getGroupsByUser(SecurityUtils.getUsername());
     	User currentUser= database.getUserByLogin(SecurityUtils.getUsername());
@@ -66,13 +67,16 @@ public class ExerciseChartsPage extends VerticalLayout {
 				HashMap<String, Double> data= database.inGroupGetCumulativeValuesByUserAndType(comboBoxGroup.getValue(),
 						comboBoxExercise.getValue());
         		Chart pieChart = new Chart(ChartType.PIE);
+        		pieChart.setWidth("35%");
+				pieChart.setHeight("100%");
         		Configuration pieChartConfig= pieChart.getConfiguration();
         		pieChartConfig.setTitle("Member Contribution");
         		pieChartConfig.setSubTitle(comboBoxExercise.getValue());
         		
-        		/*Grid<Exercise> grid= new Grid<>();
-            	grid.addColumn("Members");
-            	grid.addColumn("Exercise Added");*/
+        		Grid<Exercise> grid= new Grid<>(Exercise.class);
+        		grid.setWidth("65%");
+				grid.setHeight("100%");
+            	grid.setColumns("owner","type", "normalInfo","normalDate");
         		
         		Tooltip tooltip = new Tooltip();
                 tooltip.setValueSuffix(getCaption(comboBoxExercise.getValue()));
@@ -88,25 +92,29 @@ public class ExerciseChartsPage extends VerticalLayout {
                 dataSeries.setName("Score");
                 ArrayList<User> usersList = (ArrayList<User>) database.getUsersByGroup(comboBoxGroup.getValue());
                 Date date= new Date();
-                for(int i= 0; i<usersList.size(); i++)
+                List<Exercise> allExercise = new ArrayList<Exercise>();
+                for(int i = 0; i<usersList.size(); i++)
 				{
                 	User user= usersList.get(i);
                 	dataSeries.add(new DataSeriesItem(user.getLogin(), data.get(user.getLogin())));
-                	/*List<Exercise> theExercise= database.getExercisesByOwnerAndDateInterval(usersList.get(i).getLogin(), 
-                			new Date(date.getTime()-Long.valueOf("31536000000")), date);*/
+                	allExercise.addAll(database.getExercisesByOwnerAndDateInterval(usersList.get(i).getLogin(),
+                			new Date(date.getTime()-Long.valueOf("31536000000")), date));
                 }
+				grid.setItems(allExercise);
                 pieChartConfig.setSeries(dataSeries);
                 pieChart.setVisibilityTogglingDisabled(true);
                 horizontalLayout.removeAll();
                 horizontalLayout.add(pieChart);
-                //horizontalLayout.add(grid);
+                horizontalLayout.add(grid);
         	});
-        	verticalLayout.add(comboBoxExercise);
+			horizontalLayoutUIs.add(comboBoxExercise);
     	});
-    	verticalLayout.remove(comboBoxExercise);
-    	verticalLayout.add(comboBoxGroup);
-    	horizontalLayout.add(verticalLayout);
-    	add(verticalLayout, horizontalLayout);  	
+    	remove(comboBoxExercise);
+		horizontalLayoutUIs.add(comboBoxGroup);
+		horizontalLayoutUIs.setWidthFull();
+		horizontalLayoutUIs.setHeight("10%");
+		add(horizontalLayoutUIs);
+    	add(horizontalLayout);
     }
     
     public String getCaption(String type)

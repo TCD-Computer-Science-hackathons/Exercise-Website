@@ -128,7 +128,7 @@ public class MongoDBOperations {
     public List<Exercise> getExercisesByOwnerAndDateInterval(String owner, Date date1, Date date2)
     {
         Query searchExercise = new Query(Criteria.where("owner").is(owner).and("date").gt(date1.getTime()).
-                and("date").lt(date2.getTime()));
+                lt(date2.getTime()));
         List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
         return resultExercises;
     }
@@ -149,8 +149,8 @@ public class MongoDBOperations {
 
     public List<Exercise> getExercisesByTypeAndDateInterval(String type, Date date1, Date date2)
     {
-        Query searchExercise = new Query(Criteria.where("type").is(type).and("date").gt(date1.getTime()).
-                and("date").lt(date2.getTime()));
+        Query searchExercise = new Query(Criteria.where("type").is(type).and("date").gt(date1.getTime())
+                .lt(date2.getTime()));
         List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
         return resultExercises;
     }
@@ -174,7 +174,7 @@ public class MongoDBOperations {
     public List<Exercise> getExercisesByOwnerAndTypeAndDateInterval(String owner, String type, Date date1, Date date2)
     {
         Query searchExercise = new Query(Criteria.where("owner").is(owner).and("type").is(type).and("date").
-                gt(date1.getTime()).and("date").lt(date2.getTime()));
+                gt(date1.getTime()).lt(date2.getTime()));
         List<Exercise> resultExercises = mongoTemplate.query(Exercise.class).matching(searchExercise).all();
         return resultExercises;
     }
