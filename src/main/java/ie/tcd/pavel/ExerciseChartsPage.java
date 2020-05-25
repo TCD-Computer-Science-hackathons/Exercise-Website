@@ -1,10 +1,10 @@
 package ie.tcd.pavel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.AbstractSeries;
 import com.vaadin.flow.component.charts.model.AxisTitle;
@@ -22,7 +22,7 @@ import com.vaadin.flow.component.charts.model.XAxis;
 import com.vaadin.flow.component.charts.model.YAxis;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -55,26 +55,27 @@ public class ExerciseChartsPage extends VerticalLayout {
     	}
     	
     	ComboBox<String> comboBoxGroup= new ComboBox<>();
+    	ComboBox<String> comboBoxExercise= new ComboBox<>();
     	comboBoxGroup.setLabel("Group");
     	comboBoxGroup.setItems(groupsString);
     	comboBoxGroup.addValueChangeListener(groupEvent ->{
     		    		
-    		ComboBox<String> comboBoxExercise= new ComboBox<>();
-    		verticalLayout.remove(comboBoxExercise);
         	comboBoxExercise.setLabel("Exercise");
         	comboBoxExercise.setItems(exercises);
         	comboBoxExercise.addValueChangeListener(exerciseEvent ->{
-				verticalLayout.remove(comboBoxExercise);
 				HashMap<String, Double> data= database.inGroupGetCumulativeValuesByUserAndType(comboBoxGroup.getValue(),
 						comboBoxExercise.getValue());
         		Chart pieChart = new Chart(ChartType.PIE);
-        		horizontalLayout.remove(pieChart);
         		Configuration pieChartConfig= pieChart.getConfiguration();
         		pieChartConfig.setTitle("Member Contribution");
         		pieChartConfig.setSubTitle(comboBoxExercise.getValue());
         		
+        		/*Grid<Exercise> grid= new Grid<>();
+            	grid.addColumn("Members");
+            	grid.addColumn("Exercise Added");*/
+        		
         		Tooltip tooltip = new Tooltip();
-                tooltip.setValueDecimals(1);
+                tooltip.setValueSuffix(getCaption(comboBoxExercise.getValue()));
                 pieChartConfig.setTooltip(tooltip);
                 
                 PlotOptionsPie plotOptions = new PlotOptionsPie();
@@ -84,23 +85,48 @@ public class ExerciseChartsPage extends VerticalLayout {
                 pieChartConfig.setPlotOptions(plotOptions);
                 
                 DataSeries dataSeries = new DataSeries();
+                dataSeries.setName("Score");
                 ArrayList<User> usersList = (ArrayList<User>) database.getUsersByGroup(comboBoxGroup.getValue());
+                Date date= new Date();
                 for(int i= 0; i<usersList.size(); i++)
 				{
                 	User user= usersList.get(i);
                 	dataSeries.add(new DataSeriesItem(user.getLogin(), data.get(user.getLogin())));
+                	/*List<Exercise> theExercise= database.getExercisesByOwnerAndDateInterval(usersList.get(i).getLogin(), 
+                			new Date(date.getTime()-Long.valueOf("31536000000")), date);*/
                 }
                 pieChartConfig.setSeries(dataSeries);
                 pieChart.setVisibilityTogglingDisabled(true);
+                horizontalLayout.removeAll();
                 horizontalLayout.add(pieChart);
+                //horizontalLayout.add(grid);
         	});
         	verticalLayout.add(comboBoxExercise);
     	});
+    	verticalLayout.remove(comboBoxExercise);
     	verticalLayout.add(comboBoxGroup);
     	horizontalLayout.add(verticalLayout);
-    	add(verticalLayout, horizontalLayout);
+    	add(verticalLayout, horizontalLayout);  	
     }
-
-
-
+    
+    public String getCaption(String type)
+    {
+        if(exerciseTypes.getDistanceExercises().contains(type))
+        {
+            return " meters";
+        }
+        else if(exerciseTypes.getRepExercises().contains(type))
+        {
+        	return " reps";
+        }
+        else if(exerciseTypes.getTimeExercises().contains(type))
+        {
+        	return " minutes";
+        }
+        else if(exerciseTypes.getWeightExercises().contains(type))
+        {
+        	return " kg";
+        }
+        else return "";
+    }
 }
