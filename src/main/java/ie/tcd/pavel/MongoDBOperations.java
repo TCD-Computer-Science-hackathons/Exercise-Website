@@ -188,15 +188,32 @@ public class MongoDBOperations {
     public void insertGroup(String name, String password, String user)
     {
         mongoTemplate.insert(new Group(name,user));
-        mongoTemplate.insert(new GroupPassword(name,encoder.encode(password)));
+        if(getUsersByGroup(name).size() < 2) {
+            mongoTemplate.insert(new GroupPassword(name,encoder.encode(password)));
+        }
     }
+
+
+    public Group findGroup(String user, String group)
+    {
+        Query searchGroup = new Query(Criteria.where("user").is(user).and("name").is(group));
+        Group groupResult = mongoTemplate.findOne(searchGroup,Group.class);
+        return groupResult;
+
+    }
+
 
     public boolean groupExists(String name, String password)
     {
         Query searchGroupPassword = new Query(Criteria.where("name").is(name));
         List<GroupPassword> resultGroups = mongoTemplate.query(GroupPassword.class).matching(searchGroupPassword).all();
-        System.out.println(resultGroups.get(0).getPassword());
-        return encoder.matches(password,resultGroups.get(0).getPassword());
+        if(resultGroups.size()>0) {
+            return encoder.matches(password, resultGroups.get(0).getPassword());
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean groupExists(String name)
@@ -298,22 +315,34 @@ public class MongoDBOperations {
         return  cumulativeData;
     }
 
+    public void makeAdmin(String user, String group)
+    {
+        mongoTemplate.insert(new GroupAdmin(user,group));
+    }
+
+    public boolean checkIfAdmin(String user, String group)
+    {
+        Query checkAdmin = new Query(Criteria.where("admin").is(user).and("groupName").is(group));
+        List<GroupAdmin> admins = mongoTemplate.query(GroupAdmin.class).matching(checkAdmin).all();
+        return admins.size()>0;
+    }
+
+    public void removeUserFromGroup(String user, String group)
+    {
+        Group groupToRemove = this.findGroup(user,group);
+        mongoTemplate.remove(groupToRemove);
+    }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public void deleteGroupFinal(String name)
+    {
+        Query findAdmins = new Query(Criteria.where("groupName").is(name));
+        List<GroupAdmin> admins = mongoTemplate.query(GroupAdmin.class).matching(findAdmins).all();
+        for(GroupAdmin admin : admins) {
+            mongoTemplate.remove(admin);
+        }
+        Query searchGroupPassword = new Query(Criteria.where("name").is(name));
+        GroupPassword password = mongoTemplate.findOne(searchGroupPassword,GroupPassword.class);
+        mongoTemplate.remove(password);
+    }
 }
