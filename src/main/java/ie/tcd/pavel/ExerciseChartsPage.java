@@ -23,6 +23,7 @@ import com.vaadin.flow.component.charts.model.YAxis;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -37,14 +38,16 @@ public class ExerciseChartsPage extends VerticalLayout {
 
 	ExerciseTypes exerciseTypes;
     MongoDBOperations database;
-    HorizontalLayout horizontalLayout= new HorizontalLayout();
+    VerticalLayout verticalLayout= new  VerticalLayout();
 	HorizontalLayout horizontalLayoutUIs = new HorizontalLayout();
     public ExerciseChartsPage() {
+		this.setWidthFull();
+		this.setAlignItems(Alignment.CENTER);
+		this.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+    	horizontalLayoutUIs.setWidthFull();
     	database = BeanUtil.getBean(MongoDBOperations.class);
         exerciseTypes = BeanUtil.getBean(ExerciseTypes.class);
-        horizontalLayout.setWidthFull();
-        horizontalLayout.setHeight("90%");
-		this.setSizeFull();
+		verticalLayout.setWidthFull();
         String[] exercises = exerciseTypes.getExerciseTypes();  
     	List<Group> groups= database.getGroupsByUser(SecurityUtils.getUsername());
     	User currentUser= database.getUserByLogin(SecurityUtils.getUsername());
@@ -67,15 +70,13 @@ public class ExerciseChartsPage extends VerticalLayout {
 				HashMap<String, Double> data= database.inGroupGetCumulativeValuesByUserAndType(comboBoxGroup.getValue(),
 						comboBoxExercise.getValue());
         		Chart pieChart = new Chart(ChartType.PIE);
-        		pieChart.setWidth("35%");
-				pieChart.setHeight("100%");
+        		pieChart.setWidthFull();
         		Configuration pieChartConfig= pieChart.getConfiguration();
         		pieChartConfig.setTitle("Member Contribution");
         		pieChartConfig.setSubTitle(comboBoxExercise.getValue());
         		
         		Grid<Exercise> grid= new Grid<>(Exercise.class);
-        		grid.setWidth("65%");
-				grid.setHeight("100%");
+        		grid.setWidthFull();
             	grid.setColumns("owner","type", "normalInfo","normalDate");
         		
         		Tooltip tooltip = new Tooltip();
@@ -103,18 +104,17 @@ public class ExerciseChartsPage extends VerticalLayout {
 				grid.setItems(allExercise);
                 pieChartConfig.setSeries(dataSeries);
                 pieChart.setVisibilityTogglingDisabled(true);
-                horizontalLayout.removeAll();
-                horizontalLayout.add(pieChart);
-                horizontalLayout.add(grid);
+				verticalLayout.removeAll();
+				verticalLayout.add(pieChart);
+				verticalLayout.add(grid);
         	});
 			horizontalLayoutUIs.add(comboBoxExercise);
     	});
     	remove(comboBoxExercise);
 		horizontalLayoutUIs.add(comboBoxGroup);
 		horizontalLayoutUIs.setWidthFull();
-		horizontalLayoutUIs.setHeight("10%");
 		add(horizontalLayoutUIs);
-    	add(horizontalLayout);
+    	add(verticalLayout);
     }
     
     public String getCaption(String type)
