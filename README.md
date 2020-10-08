@@ -1,8 +1,8 @@
 # Fit Together
 ## Video Demo & WebApp
-[Youtube link] (https://www.youtube.com/watch?v=7M7AntRmEEE&feature=emb_logo)
+[Youtube link](https://www.youtube.com/watch?v=7M7AntRmEEE&feature=emb_logo)
 
-[Link to web App] (https://fit-together.herokuapp.com). Please note: It will take sometime for a dyno to start up. When a url is not accessed for a long time, heroku automatically puts the app into sleeping mode. However, after starting up, the app runs properly.
+[Link to web App](https://fit-together.herokuapp.com). Please note: It will take sometime for a dyno to start up. When a url is not accessed for a long time, heroku automatically puts the app into sleeping mode. However, after starting up, the app runs properly.
 ## Inspiration
 Before the pandemic, we really enjoyed working out in our college gym. In early March Trinity College Dublin was closed for students and the education continued online. Moreover, all the sports facilities were closed. Since we could not meet in person in the gym to motivate each other, we decided that we should create a tool for sharing our workouts. Now that some of us left Ireland to go back to their home countries, because of COVID-19, we understood that participating in "Teens against Covid-19" is a perfect opportunity to showcase our skills and at the same time support each other in such uncertain times. Furthermore, we have conducted a survey among our classmates to find out whether they experienced problems similar to what we faced. Those students who used to exercise in the gym or take part in sports clubs have claimed that they have lost motivation to work out because they do not feel the healthy competition with their mates, relatives, and neighbors, which they used to experience almost every day before the virus spread. Our project aims to help people stay healthy and fit during the quarantine, which is a very important goal, as our mental health is directly dependent on our physical health. 
 ## What it does [link] (https://drive.google.com/file/d/1pPOdLjavAzAyz522yb1ZhqNRWebVmJsz/view?usp=sharing)
