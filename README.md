@@ -1,5 +1,6 @@
 # Fit Together
 ## Video Demo & WebApp
+[Devpost link](https://devpost.com/software/teens-against-covid)
 [Youtube link](https://www.youtube.com/watch?v=7M7AntRmEEE&feature=emb_logo)
 
 [Link to web App](https://fit-together.herokuapp.com). Please note: It will take sometime for a dyno to start up. When a url is not accessed for a long time, heroku automatically puts the app into sleeping mode. However, after starting up, the app runs properly.
